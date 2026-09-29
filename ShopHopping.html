@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="images/Favicon32x32.png">
+  <title>豆花店巡禮 | DouHua Hopping</title>
+  <style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 全局設定平滑滾動 */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #333333;
+    background-color: #ffffff; /* 主色：白色 */
+    line-height: 1.6;
+    padding: 40px 20px;
+    letter-spacing: 0.1em;
+  }
+
+  a{
+    text-decoration: none;
+  }
+
+  .product-location a {
+    text-decoration: none;
+    color: #d91a2a; /* 預設連結使用鮮豔紅點綴 */
+    transition: color 0.2s ease;
+  }
+
+  .product-location a:hover {
+    color: #ffffff; /* 懸停時切換為深酒紅 */
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    background-color: #d91a2a;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  /* ================= 隨畫面滑動的 Menu 樣式 ================= */
+  /* 漢堡按鈕 */
+  .menu-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: #69140e; /* 裝飾主色：深酒紅 */
+    color: #ffffff;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(105, 20, 14, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+
+  .menu-toggle:hover {
+    background-color: #d91a2a; /* 裝飾亮色：鮮艷紅 */
+    transform: scale(1.05);
+  }
+
+  /* 選單抽屜 */
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    right: -250px; /* 預設隱藏在右側外 */
+    width: 250px;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.08);
+    z-index: 999;
+    padding-top: 80px;
+    transition: right 0.3s ease;
+    border: none; 
+  }
+
+  /* 選單展開時的狀態 */
+  .nav-menu.active {
+    right: 0;
+  }
+
+  .nav-menu ul {
+    list-style: none;
+  }
+
+  .nav-menu li a {
+    display: block;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333333;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s, color 0.2s, padding-left 0.2s;
+  }
+
+  .nav-menu li a:hover {
+    background-color: #fff8f8; /* 帶有微紅底色的輕盈感 */
+    color: #d91a2a;
+    padding-left: 35px;
+    border-left: 3px solid #d91a2a; /* 邊框裝飾線 */
+  }
+
+  /* 選單遮罩 (點擊背景關閉選單) */
+  .menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(105, 20, 14, 0.15); /* 帶有酒紅調的半透明遮罩 */
+    z-index: 998;
+    display: none;
+  }
+
+  .menu-overlay.active {
+    display: block;
+  }
+  /* ========================================================= */
+
+  /* 頂部標題區域 */
+  .header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    font-weight: bold;
+    color: #69140e; /* 標題採用深酒紅 */
+    margin-bottom: 15px;
+    letter-spacing: 1.5px;
+  }
+
+  .header p {
+    font-size: 13px;
+    color: #666666;
+    line-height: 1.8;
+  }
+
+  /* 店家列表網格 */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px 30px;
+    margin-bottom: 50px;
+  }
+
+  /* 單一店家卡片 */
+  .product-card {
+    position: relative; /* 讓tag對齊用 */
+    display: flex;
+    flex-direction: column;
+    scroll-margin-top: 80px; /* 避免滑動定位時貼頂遮擋 */
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #f5f5f5;
+    transition: box-shadow 0.3s ease;
+    /* 設定卡片過渡動畫基礎 */
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* 淡出狀態：透明度歸零、微幅縮小 */
+  .product-card.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  /* 完全隱藏狀態：釋放版面空間 */
+  .product-card.hidden {
+    display: none !important;
+  }
+
+  .product-card:hover {
+    box-shadow: 0 4px 15px rgba(105, 20, 14, 0.06); /* 滑過卡片時柔和深紅陰影 */
+  }
+
+  .product-header {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .product-name-sub {
+    font-size: 16px;
+    font-weight: bold;
+    color: #69140e; /* 店名強調使用深酒紅 */
+    margin-bottom: 4px;
+  }
+
+  .product-location {
+    font-size: 13px;
+    color: #666666;
+    margin-bottom: 4px;
+  }
+
+  .product-location a {
+    color: #d91a2a;
+    font-weight: 500;
+  }
+
+  .product-content {
+    display: flex;
+    flex-direction: column; /* 改為垂直排列 */
+    gap: 15px;
+  }
+
+  .product-image {
+   width: 100%; /* 寬度改為 100% */
+    aspect-ratio: 16 / 9; /* 可依需求改為 1/1 方形或 16/9 橫圖 */
+    object-fit: cover;
+    background-color: #fafafa;
+    border-radius: 4px;
+    border: 1px solid #eee;
+  }
+
+  .product-info {
+    width: 100%;
+  }
+
+  .product-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #222222;
+    margin-bottom: 6px;
+  }
+
+  .product-tag {
+    font-size: 12px;
+    color: #888888;
+    margin-bottom: 10px;
+  }
+
+  .product-description {
+    font-size: 12px;
+    color: #555555;
+    text-align: justify;
+    line-height: 1.6;
+  }
+
+  /* 評分元件樣式 */
+  .rating {
+    color: #e0e0e0; /* 未得分的灰色圓點 */
+    font-size: 13px;
+  }
+
+  .rating .active {
+    color: #d91a2a; /* 得分的紅圓點 */
+  }
+
+  /* 值得吃 TAG 樣式 */
+  .badge-tag {
+    position: absolute;   /* 設定絕對定位 */
+    top: 5px;            /* 距離卡片頂部距離 */
+    right: 15px;          /* 距離卡片右側距離 */
+    width: auto;          /* auto 讓寬度隨文字自動調整 */
+    display: inline-block;
+    background-color: #d91a2a; /* 亮紅色背景 */
+    color: #ffffff;            /* 白字 */
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin: 4px 0 6px 0;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 6px rgba(217, 26, 42, 0.2);
+    z-index: 2;
+  }
+
+  /* 底部連結 */
+  .footer-link {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .footer-link a {
+    display: inline-block;
+    color: #d91a2a;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 24px;
+    border: 1.5px solid #d91a2a;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .footer-link a:hover {
+    background-color: #d91a2a;
+    color: #ffffff;
+  }
+
+
+  /* 響應式調整 */
+  @media (max-width: 680px) {
+    .product-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- 漢堡按鈕 -->
+  <button class="menu-toggle" id="menuToggle" aria-label="選單">☰</button>
+
+  <!-- 滑動 Menu 選單 -->
+  <nav class="nav-menu" id="navMenu">
+    <ul>
+      <li><a href="#north" class="menu-item">北區</a></li>
+      <li><a href="#west-central" class="menu-item">中西區</a></li>
+      <li><a href="#anping" class="menu-item">安平區</a></li>
+      <li><a href="#yongkang" class="menu-item">永康區</a></li>
+      <li><a href="javascript:void(0);" id="toggleRankBtn">值得吃</a></li>
+      <li><a href="#top" class="menu-item">TOP</a></li>
+    </ul>
+  </nav>
+
+  <!-- 選單背景遮罩 -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <div class="container" id="top">
+    <!-- 頁頭資訊 -->
+    <header class="header">
+      <h1>台南豆花店巡禮</h1>
+      <p>店完全是隨機找的，GOOGLE MAP上看到什麼就記下。<br>
+      有很好奇一定要去看看的，也有剛好看到又順路便MEMO下的，口味與心得全隨我個人喜好。<br>
+      口感形容：綿，幾乎不怎麼受力就會融化，形狀消失。<br>
+      嫩，有點彈性但稍微受力便會「散開」，還是會保留一點形狀。<br>
+      嫩+綿，有點彈性但稍微受力便會「融化」，差別在這裡。<br>
+      硬，碎開，形狀保留，比布丁再散一點。</p>
+    </header>
+
+    <!-- 店家區塊 -->
+    <main class="product-grid">
+
+    <!-- 店家 嘉義市 -->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➊</span>
+        <div class="product-header">
+          <div class="product-name-sub">陳品手作豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/fr6mKyLEDSPwHwmy9" target="_blank">嘉義市 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/陳品手作豆花.png" alt="香草鮮奶豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：香草鮮奶豆花</h2>
+            <p class="product-description">營業時間：10:30-20:30<br>
+              公休日：日<br>
+              個人心得：實木風，常見豆花店設計。<br>
+              香草鮮奶豆花+配料花生，50元，量適中，跟其他店家相比不算貴，而且是鮮奶，香草還是放香草籽，可以算便宜。豆花口感嫩+綿，湯有蠻多種的，一般糖水、杏仁茶、豆漿、香草牛奶。<br>
+              花生跟牛奶很搭，他們的黑糖粉粿也很Q很有嚼勁，很厲害，目前打敗山海豆花榮登我心目中第一名。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●</span>●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區1 -->
+      <article class="product-card" id="north">
+        <div class="product-header">
+          <div class="product-name-sub">泉威布丁豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/B6WjEhXXNGoQLGgdA" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/泉威布丁豆花.png" alt="原味白豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：原味白豆花</h2>
+            <p class="product-description">營業時間：10:30-20:30<br>
+              公休日：日<br>
+              個人心得：原木白色系、無印風，簡潔帶一點文青感。門是原木門搭長虹玻璃。全都是單人位，共六座，座位數少。<br>
+              原味白豆花可加一個配料，選了薏仁。糖水是另外一個小杯裝倒進去，豆花有本身的湯跟薏仁的湯，混進去後甜味淡淡的不會很甜。<br>
+              薏仁似乎剛煮好(店剛開就到)還不夠爛，但我喜歡脆一點的沒有問題。豆花偏硬但有淡淡豆味。<br>
+              白瓷碗，碗內底部有LOGO，還印了一隻螞蟻很有趣。一開始豆花蓋滿看不到，吃到一半才露出來，不知道會嚇一跳的小巧思。搭配金湯匙、花窗玻璃底的木托盤，木把手玻璃小碗(放糖水)。<br>
+              另外有餐食：牛肉麵、蝦仁飯、黃咖哩、綠咖哩、打拋豬，還有飲料、果凍等等……。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●●●</span></span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●</span>●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區2 -->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➌</span>
+        <div class="product-header">
+          <div class="product-name-sub">台南豆花綠豆王</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/76DKuHErbDhMArYg9" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/台南豆花綠豆王.png" alt="綠豆豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綠豆豆花</h2>
+            <p class="product-description">營業時間：10:00-16:30<br>
+              公休日：日<br>
+              個人心得：傳統家庭式，店面佔了兩個店面的大小，但座位數少，應該是主外帶。<br>
+              綠豆偏甜，吃起來跟我媽煮的很像，好吃。豆花點小碗量還是很多，吃到一半只剩豆花沒糖水，店員還主動過來問要不要加糖水。這樣才40元，便宜又划算！<br>
+              豆花嫩+綿密，好吃。不愧是家族企業傳承感重的店。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●</span>●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區3 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">薏+仁</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/wTtR3stgqQqUQ42h8" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/薏+仁.png" alt="加料(檸檬+珍珠)豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：加料豆花</h2>
+            <p class="product-description">營業時間：11:00-19:00<br>
+              公休日：一<br>
+              個人心得：看照片是原木簡潔風，去現場有掛紅底白字橫條宣傳，雖然顯眼但不搭。門口貼暫不內用僅外帶，因為門是透明門所以看得一清二楚，內用區全被家庭雜物堆滿，感覺不會再開放內用。<br>
+              加料豆花(兩種配料)，我選了檸檬汁+珍珠。糖水也是另外一包自己加。沒加糖前水吃了一口，就覺得檸檬汁很提味很好吃，再加糖水變更好吃。可以再去吃看看別家的檸檬豆花。豆花是嫩+綿，及格，但因為其他外部因素並不推荐。<br>
+              店面問題不算問題，因為只是改成僅外帶，內用區再亂也沒差。問題在量，豆花的外帶杯是350ml的杯子(早餐店小杯飲料)，量少，價格45。跟其他店家比很貴，即便是泉威布丁豆花，雖然他在台南價格算貴，但店裡氛圍跟餐具等小巧思可以相抵。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●</span>●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區4 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">榕樹下璞味綿綿冰</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/4mAhCeu6ZsqNjXtDA" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/榕樹下璞味綿綿冰.png" alt="花生豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：花生豆花</h2>
+            <p class="product-description">營業時間：12:00-21:00<br>
+              公休日：無<br>
+              個人心得：原木及深綠色系，台式民初復古懷舊冰菓室，桌椅皆是。門面與裝潢皆是該風格。<br>
+              主打綿綿冰，但也有賣豆花。豆花的配料方式是看你點什麼口味的豆花會配什麼口味的湯及冰，例如花生豆花配花生湯及花生冰，以此類推。<br>
+              冰最好吃(畢竟主題就是冰店)，但配料多樣又好吃，豆花偏硬最不好吃。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●●●</span></span> 
+              / 豆花
+              <span class="rating"><span class="active"></span>●●●●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區5 -->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➍</span>
+        <div class="product-header">
+          <div class="product-name-sub">小冰豚手作冰品</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/8GwmA68C3xyC1VTU6" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/小冰豚手作冰品.png" alt="鮮奶豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：鮮奶豆花</h2>
+            <p class="product-description">營業時間：11:30–20:30<br>
+              公休日：一<br>
+              個人心得：鮮奶豆花，預設配四種料，紅豆、綠豆、薏仁、小珍珠，料的甜位把奶味蓋過，有點可惜。<br>
+              但豆花綿密好吃，店裡有冷氣很舒適。特色是各種模型圍繞，店主似乎是特攝片粉，尤其是哥吉拉幾乎擺滿。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●</span>●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區6 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">芸馨冰棧</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/McigXi57fZYFHVYC8" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/芸馨冰棧.png" alt="珍珠豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：珍珠豆花</h2>
+            <p class="product-description">營業時間：11:00–22:00<br>
+              公休日：一<br>
+              個人心得：豆花嫩，可加冰，濃郁黑糖水偏甜(可調甜度)，冰化掉後甜度適中。<br>
+              看店名應該是以冰品為主。
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●</span>●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●</span>●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 北區7 -->
+      <article class="product-card" id="yongkang">
+        <div class="product-header">
+          <div class="product-name-sub">琦玉豆腐店(開元店)</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/nxDGqVjfwLZBBkZV8" target="_blank">北區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/琦玉豆腐店.png" alt="綜合豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綜合豆花</h2>
+            <p class="product-description">營業時間：08:00- 19:30<br>
+              公休日：無<br>
+              個人心得：一般飲料店的大小，橘色主色系、古早味台灣風格。無座位僅外帶。<br>
+              綜合豆花(配料：硬花生+粉圓)，臨走前去買豆漿當土產，順便加點一碗豆花試看看味道，花生是普通的硬花生，這個看個人喜好，我喜歡豆花裡加軟的。<br>
+              這間的豆花豆味不濃，豆花偏硬，看來不同分店還是有落差。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●</span>●●●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+
+      <!-- 店家 中西區1 -->
+      <article class="product-card" id="west-central">
+        <div class="product-header">
+          <div class="product-name-sub">同記安平豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/171688rFN738wZs79" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/同記安平豆花.png" alt="綠豆豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綠豆豆花</h2>
+            <p class="product-description">營業時間：10:00-22:00<br>
+              公休日：無<br>
+              個人心得：豆花口感偏硬，普通。<br>
+              可能放了綠豆，感覺糖水過甜。<br>
+              裝潢是老宅改裝，有一點破敗風格XDD<br>屋內有天井，牆面是用各式舊窗拼成的牆，很有特色。可是裝飾零散風格不統一，才會看起來有種破敗感。<br>
+              菜單特色：有一個叫雪淇冰的東西，不知道是什麼，沒點。懷疑是雪花冰或綿綿冰。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●●</span>●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●</span>●●</span><br>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 中西區2 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">修安扁擔豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/YfCBWAtQYmYxpFkd7" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/修安扁擔豆花.png" alt="扁擔豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：扁擔豆花</h2>
+            <p class="product-description">營業時間：11:50 -21:30<br>
+              公休日：無<br>
+              個人心得：菜市場路邊攤感，有店面但很小，鐵桌佔據在騎樓裡，如果坐滿了的話應該是蠻擠的位子間隔很密。<br>
+              扁擔豆花只有純豆花跟糖水，豆花口感嫩(比同記安平豆花嫩)，但沒有到山海豆花的程度，糖水甜度不高，剛剛好。可以決定要不要加小碎冰<br>
+              有賣伴手禮，五色粉粿(原味、黑糖、豆漿、洛神、水果)、咖啡粉粿、手工焦糖布丁、桶裝豆花、情人果、青脆梅、蒜香奶油。也有賣冰品。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●</span>●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 中西區3 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">山海豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/2kcG2szftprMPLq1A" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/山海豆花.png" alt="白玉粉圓花生酥絹豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：白玉粉圓花生酥絹豆花</h2>
+            <p class="product-description">營業時間：11:00 -21:00<br>
+              公休日：無<br>
+              個人心得：因為是使用林百貨的建築，所以算日治時期結合民初的時尚木造房。靠窗單人座很多，有角落位，桌間距離寬廣。金邊白瓷碗、金湯匙、紅木托盤。<br>
+              白玉粉圓花生酥絹豆花，跟松山機場比，碗小了1/3，價格卻相同，因為縮水所以算貴。不知道是不是因為碗縮水的關係，花生酥粉混下去反而覺得過甜。豆花是嫩的，好吃，這點不變。<br>
+              這道「日本東京辣味花生酥絹豆花」算特色但我不敢吃。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●●●</span></span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●</span>●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 中西區4 -->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➊</span>
+        <div class="product-header">
+          <div class="product-name-sub">邱家豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/xuMR4epGDW8WHTu78" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content" >
+          <img class="product-image" src="images/邱家豆花.png" alt="原味豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：原味豆花</h2>
+            <p class="product-description">營業時間：12:00–21:00<br>
+              公休日：三<br>
+              個人心得：傳統路邊小吃攤，座位大部份在騎樓。<br>
+              原味豆花，無配料，黑糖糖水，適中偏甜，30元很便宜。豆花極嫩，不綿，目前吃過最嫩的口感，目前跟陳品手作豆花一起並列我心目中第一名。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 中西區5 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">豆腐花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/bJD2i495Q67JAkgU8" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/豆腐花.png" alt="綠豆豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綠豆豆花</h2>
+            <p class="product-description">營業時間：13:00–20:00，13:00–17:00<br>
+              公休日：一<br>
+              個人心得：文青咖啡店帶一點復古感，有主題色統一(白綠配色)，可惜的是門面的窗花改了(見照片有前後對比)，綠瓷碗、綠瓷湯匙(都是主題色系) 。<br>
+              店內放的BGM也很咖啡廳悠閒感。<br>
+              綠豆豆花45元，口感綿，一般及格。因為經歷過兩間豆花店的外帶都是350ml小杯，明顯小於內用碗，決定在店內吃。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●●</span>●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●</span>●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 中西區6 -->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➋</span>
+        <div class="product-header">
+          <div class="product-name-sub">德記古早味汕頭豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/JNJdfjpNAi8mj5Dn9" target="_blank">中西區 Google map</a></div>
+        </div>
+        <div class="product-content" >
+          <img class="product-image" src="images/德記古早味汕頭豆花.png" alt="花生豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：花生豆花</h2>
+            <p class="product-description">營業時間：15:00–00:00<br>
+              公休日：無<br>
+              個人心得：座位大部份在騎樓。<br>
+              花生豆花，糖水是紅糖+黑糖，很特別可以調甜度，指數1-10。因為他是先放糖漿再放糖水湯，所以只要控制糖漿便能控制甜度。<br>
+              價格以台南來說偏貴，但豆花口感嫩+綿，花生鬆軟又香，糖水也香，是好吃的傳統型豆花。聽常客聊天，檸檬+珍珠也很推荐。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●</span>●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 安平區1 -->
+      <article class="product-card" id="anping" class="product-card rank5">
+        <span class="badge-tag">值得吃➋</span>
+        <div class="product-header">
+          <div class="product-name-sub">瓦地加芋圓</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/NcgGBbCJNajaJv8N6" target="_blank">安平區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/瓦地加芋圓.png" alt="芋圓豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：芋圓豆花</h2>
+            <p class="product-description">營業時間：11:30-18:00<br>
+              公休日：一<br>
+              個人心得：傳統家庭式，內用四桌、騎樓兩桌，皆是木頭大桌搭傳統木長椅，乾淨明亮。<br>
+              芋圓紮實好吃，豆花嫩、微豆味，糖水甜度一般偏甜(不確定是否受芋圓影響)。
+              最接近小時候印象中的傳統豆花。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●</span>●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 安平區2 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">仙蒔光甜品</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/TAJLMBYQzS5SWbhz8" target="_blank">安平區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/仙蒔光甜品.png" alt="純豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：純豆花</h2>
+            <p class="product-description">營業時間：12:30-20:00<br>
+              公休日：日<br>
+              個人心得：LOGO、招牌很文青風，內裝很早期台灣家庭式。<br>
+              無座位僅外帶。地點很微妙，開在中華電信台南營運處客戶設備中心的警衛室。<br>
+              主仙草類，我點純豆花(無配料)，口感特別，不是嫩是綿。價格跟其他豆花店相比，普遍貴5元。黑糖水，很甜、焦味重(苦)。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●●</span>●●</span> 
+              / 豆花
+              <span class="rating"><span class="active"></span>●●●●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 安平區3 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">安平BB彈芋圓達人</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/LS4fZcXbRcuBueoJ9" target="_blank">安平區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/安平BB彈芋圓達人.png" alt="綜合豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綜合豆花</h2>
+            <p class="product-description">營業時間：12:30-20:00<br>
+              公休日：二<br>
+              個人心得：早期台灣觀光景點的路邊餐廳風格(?)<br>
+              綜合豆花，內含芋圓跟自選配料1樣(珍珠)，芋圓有保溫。我常見的芋圓，外圍會有一層透明的膜，我不知道那個是什麼，但他們家的沒有，Q彈好吃還很香，打敗瓦地加芋圓。豆花口感是嫩的，及格。但是用的是小的外帶紙碗裝，50元在台南相比之下偏貴一點，但芋圓太好吃了，可以接受。<br>
+              好吃的是芋圓，所以豆花只是及格分。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●</span>●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●</span>●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 安平區4 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">茂記黑豆花大王</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/hseNzVd6KNmMeEX26" target="_blank">安平區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/茂記黑豆花大王.png" alt="檸檬黑豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：檸檬黑豆花</h2>
+            <p class="product-description">營業時間：13:00-17:30，六日12:30-17:30<br>
+              公休日：一、三<br>
+              個人心得：家庭式飲料店感，座位區在騎樓。<br>
+              檸檬黑豆花，他們有分黑豆花跟白豆花，因為主打是黑豆花，所以我選了黑豆花。<br>
+              口感微妙，嫩但碎，不是綿掉是碎掉，而糖水可能因為加了檸檬，甜度適中，整體勉強還行。<br>
+              選了外帶，看到現場的人吃的碗是塑膠碗公，但外帶杯是早餐店小杯飲料的大小，跟薏+仁一樣，但價格跟內用相同，外帶很不划算。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●</span>●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●</span>●●●</span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 永康區1 -->
+      <article class="product-card" id="yongkang">
+        <div class="product-header">
+          <div class="product-name-sub">琦玉豆腐店(永康店)</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/PBreTFUpQncxvj8n8" target="_blank">永康區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/琦玉豆腐店.png" alt="綜合豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：綜合豆花</h2>
+            <p class="product-description">營業時間：08:00- 19:30<br>
+              公休日：無<br>
+              個人心得：一般飲料店的大小，橘色主色系、古早味台灣風格。無座位僅外帶。<br>
+              綜合豆花(配料：紅豆+粉圓)，一般甜度，40元，嫩但又有點彈性(很微)，豆味很濃很厲害，雖然沒打敗我心頭好山海豆花，但可以並列。<br>
+              還有販售很多其他豆類製品。豆漿饅頭、白豆干、豆腐、五香滷豆干、油豆腐、豆漿、豆漿紅茶……等其他。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 永康區2 -->
+      <article class="product-card">
+        <div class="product-header">
+          <div class="product-name-sub">木木家</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/KEEds7cdktCWaeUE9" target="_blank">永康區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/木木家.png" alt="黑糖粉圓豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：黑糖粉圓豆花</h2>
+            <p class="product-description">營業時間：11:30-20:00<br>
+              公休日：五、六、日<br>
+              個人心得：傳統家庭式，攤位擺在騎樓。<br>
+              豆花嫩，黑糖糖水一般偏甜。網路上的外帶杯是透明塑膠胖胖杯，拍起來很好看，但現場外帶是普通紙碗。<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●●</span>●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●</span>●●●</span><br>
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- 店家 永康區3-->
+      <article class="product-card" class="product-card rank5">
+        <span class="badge-tag">值得吃➍</span>
+        <div class="product-header">
+          <div class="product-name-sub">吾家傳統豆花</div>
+          <div class="product-location"><a href="https://maps.app.goo.gl/PZF3QjRubTEDdX7P9" target="_blank">永康區 Google map</a></div>
+        </div>
+        <div class="product-content">
+          <img class="product-image" src="images/吾家傳統豆花.png" alt="珍珠檸檬豆花">
+          <div class="product-info">
+            <h2 class="product-title">品項：珍珠檸檬豆花</h2>
+            <p class="product-description">營業時間：14:00–19:00<br>
+              公休日：日<br>
+              個人心得：是複合式商店，騎樓賣豆花，裡面是租書店，可租可現場看，還可以點豆花邊吃邊看！<br>
+              豆花綿密好吃，加了檸檬甜度剛好，珍珠是小珍珠，小碗是別人家的大碗，才40元，非常划算!<br>
+              就是整間有一半是言情小說，這個量多到一個不可思議，最少的是少女漫畫跟男頻小說，可能是因為店主是阿婆的關係吧，她大概很愛看言情小說。(所以店裡也沒有BL小說)<br>
+              個人推薦度：裝潢
+              <span class="rating"><span class="active">●</span>●●●●</span> 
+              / 豆花
+              <span class="rating"><span class="active">●●●●●</span></span>
+            </p>
+          </div>
+        </div>
+      </article>
+
+    </main>
+
+    <!-- 頁尾連結 -->
+    <div class="footer-link">
+      <a href="#top">TOP</a>
+    </div>
+  </div>
+  <!-- JavaScript：控制選單開關與錨點點擊效果 -->
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const navMenu = document.getElementById('navMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const menuItems = document.querySelectorAll('.menu-item');
+    
+    const toggleRankBtn = document.getElementById('toggleRankBtn');
+    const allCards = document.querySelectorAll('.product-card');
+
+    // 開關選單功能
+    function toggleMenu() {
+      const isActive = navMenu.classList.contains('active');
+      if (isActive) {
+        navMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+        menuToggle.textContent = '☰';
+      } else {
+        navMenu.classList.add('active');
+        menuOverlay.classList.add('active');
+        menuToggle.textContent = '✕';
+      }
+    }
+
+    // 事件監聽
+    menuToggle.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+
+    // 點擊一般選單項目後自動關閉選單
+    menuItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (navMenu.classList.contains('active')) {
+          toggleMenu();
+        }
+      });
+    });
+
+    // 「值得吃 / 看全部」淡入淡出切換功能
+    let isFiltered = false;
+
+    toggleRankBtn.addEventListener('click', () => {
+      // 1. 觸發淡出動畫 (Fade Out)
+      allCards.forEach(card => card.classList.add('fade-out'));
+
+      // 2. 等待淡出動畫完畢 (300ms) 後切換顯示狀態並淡入 (Fade In)
+      setTimeout(() => {
+        if (!isFiltered) {
+          // 切換至「值得吃」
+          allCards.forEach(card => {
+            if (card.classList.contains('rank5') || card.querySelector('.badge-tag')) {
+              card.classList.remove('hidden');
+            } else {
+              card.classList.add('hidden');
+            }
+          });
+          toggleRankBtn.textContent = '看全部';
+          isFiltered = true;
+        } else {
+          // 切換至「看全部」
+          allCards.forEach(card => {
+            card.classList.remove('hidden');
+          });
+          toggleRankBtn.textContent = '值得吃';
+          isFiltered = false;
+        }
+
+        // 強制瀏覽器重繪後移除 fade-out 觸發淡入
+        requestAnimationFrame(() => {
+          allCards.forEach(card => card.classList.remove('fade-out'));
+        });
+      }, 300);
+
+      // 自動關閉側邊選單
+      if (navMenu.classList.contains('active')) {
+        toggleMenu();
+      }
+    });
+  </script>
+</body>
+</html>
