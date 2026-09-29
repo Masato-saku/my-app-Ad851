@@ -176,6 +176,7 @@
     border-radius: 8px;
     padding: 15px;
     border: 1px solid #f5f5f5;
+    font-size: 1em;
     transition: box-shadow 0.3s ease;
     /* 設定卡片過渡動畫基礎 */
     opacity: 1;
@@ -241,7 +242,7 @@
   }
 
   .product-title {
-    font-size: 13px;
+    font-size: 1em;
     font-weight: bold;
     color: #222222;
     margin-bottom: 6px;
@@ -254,7 +255,7 @@
   }
 
   .product-description {
-    font-size: 12px;
+    font-size: 0.8em;
     color: #555555;
     text-align: justify;
     line-height: 1.6;
@@ -316,7 +317,13 @@
   /* 響應式調整 */
   @media (max-width: 680px) {
     .header p {
-    font-size: 15px;
+    font-size: 1em;
+    }
+    .product-description {
+    font-size: 1em;
+    }
+    .product-title {
+    font-size: 1.2em;
     }
     .product-grid {
       grid-template-columns: 1fr;
