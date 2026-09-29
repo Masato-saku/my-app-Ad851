@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">  <!-- 加入這行，阻止搜尋引擎索引此頁面 -->
+  <title>任務與兌換商城</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #fff; 
+      background-size: 60px 60px;
+      background-position: 0 0, 30px 30px;
+      color: #f3e9dc;
+      padding-bottom: 60px;
+    }
+
+    /* 頂部導覽列 */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background-color: rgba(86, 84, 162, 0.95);
+      border-bottom: 1px solid #a59aca;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .navbar .logo {
+      font-size: 18px;
+      font-weight: bold;
+      color: #fff;
+      letter-spacing: 1.5px;
+    }
+
+    .nav-links a {
+      color: #a59aca;
+      text-decoration: none;
+      margin-left: 15px;
+      font-size: 14px;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto 0;
+      padding: 0 20px;
+    }
+
+    /* 區塊標題 */
+    .section-title {
+      text-align: center;
+      font-size: 24px;
+      color: #4a488e;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: #5a5acc;
+      margin: 8px auto 0;
+      border-radius: 2px;
+    }
+
+    /* 統計卡片 */
+    .total-card {
+      position: relative;
+      width: 100%;
+      background: none;
+      border: 1.5px solid #9b8dc9;
+      border-radius: 12px;
+      padding: 20px;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* 卡片網格 */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 50px;
+    }
+
+    /* 遊戲風格卡片 */
+    .game-card {
+      position: relative;
+      background: linear-gradient(180deg, #F9F5FF, #F9F5FF);
+      border: 1.5px solid #9b8dc9;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .game-card:hover {
+      transform: translateY(-5px);
+      border-color: #b3b8ff;
+      box-shadow: 0 10px 20px rgba(179, 184, 255, 0.25);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      font-size: 24px;
+      margin-right: 12px;
+      background: #C6BCE8;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid #a59aca;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #4a488e;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: #4a488e;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(74, 72, 142, 0.4);
+      padding-top: 12px;
+    }
+
+    /* 金幣標籤 */
+    .pts-badge {
+      background: none;
+      color: #231714;
+      font-size: 13px;
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    /* 按鈕樣式 */
+    .btn-redeem, .btn-reload, .btn-history {
+      background-color: #8c2b2b;
+      color: #ffffff;
+      border: 1px solid #d9534f;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-reload {
+      background-color: #316745;
+      color: #fff;
+      border: 1px solid #028760;
+    }
+
+    .btn-history {
+      background-color: #4a488e;
+      color: #fff;
+      border: 1px solid #4d5aaf;
+    }
+
+    .btn-redeem:hover { background-color: #b33636; }
+    .btn-reload:hover { background-color: #028760; }
+    .btn-history:hover { background-color: #4d5aaf; }
+
+    /* 歷史紀錄彈出視窗（Modal）樣式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      color: #333;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #4a488e;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4a488e;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    .history-list {
+      overflow-y: auto;
+      flex: 1;
+      margin-bottom: 15px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px dashed #eee;
+      font-size: 13px;
+    }
+
+    .history-item .time { color: #888; font-size: 11px; }
+    .history-item .plus { color: #2e7d32; font-weight: bold; }
+    .history-item .minus { color: #c62828; font-weight: bold; }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .btn-clear {
+      background-color: #757575;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <div class="logo">⚔️ 冒險生活指南</div>
+    <div class="nav-links">
+      <a href="#tasks">每日任務</a>
+      <a href="#shop">獎勵商城</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- 統計列表區塊 -->
+    <section id="total">
+      <div class="total-card">
+        <div>
+          <div class="card-header">
+            <div class="card-title">目前累計金幣：<span id="coin-balance" style="font-size: 20px; color: #5a5acc;">0</span> Coin</div>
+          </div>
+          <button class="btn-history" onclick="toggleHistoryModal(true)">歷史記錄</button>
+          <button class="btn-history" onclick="correctCoins()">修正</button>
+        </div>
+      </div>
+    </section>
+
+    <br/><br/>
+
+    <!-- 任務列表區塊 -->
+    <section id="tasks">
+      <h2 class="section-title">獲得金幣行動</h2>
+      <div class="card-grid">
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🛏️</div>
+              <div class="card-title">離開床</div>
+            </div>
+            <div class="card-desc">當天第一次離開床</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+1 PTS</span>
+            <button class="btn-reload" onclick="addCoins('離開床', 1)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🎨</div>
+              <div class="card-title">畫圖 (短時)</div>
+            </div>
+            <div class="card-desc">專注進行繪畫創作 30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+3 PTS</span>
+            <button class="btn-reload" onclick="addCoins('畫圖 (短時)', 3)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🎨</div>
+              <div class="card-title">畫圖 (長時)</div>
+            </div>
+            <div class="card-desc">專注進行繪畫創作 60 分鐘以上</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+5 PTS</span>
+            <button class="btn-reload" onclick="addCoins('畫圖 (長時)', 5)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🎁</div>
+              <div class="card-title">整理與上架</div>
+            </div>
+            <div class="card-desc">整理要賣的東西並完成 1 件商品上架</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+3 PTS</span>
+            <button class="btn-reload" onclick="addCoins('整理與上架', 3)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🗣️</div>
+              <div class="card-title">語言學習</div>
+            </div>
+            <div class="card-desc">進行外語練習 20～30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+2 PTS</span>
+            <button class="btn-reload" onclick="addCoins('語言學習', 2)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">⚒️</div>
+              <div class="card-title">DIY 手作</div>
+            </div>
+            <div class="card-desc">進行手作體驗 30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+3 PTS</span>
+            <button class="btn-reload" onclick="addCoins('DIY 手作', 3)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">✒️</div>
+              <div class="card-title">書法練習</div>
+            </div>
+            <div class="card-desc">靜心寫字練習 20～30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+2 PTS</span>
+            <button class="btn-reload" onclick="addCoins('書法練習', 2)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">💻</div>
+              <div class="card-title">整理電子檔案</div>
+            </div>
+            <div class="card-desc">清理與分類電腦/手機檔案 30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+2 PTS</span>
+            <button class="btn-reload" onclick="addCoins('整理電子檔案', 2)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">📷</div>
+              <div class="card-title">整理照片</div>
+            </div>
+            <div class="card-desc">整理相簿與備份篩選 30 分鐘</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+2 PTS</span>
+            <button class="btn-reload" onclick="addCoins('整理照片', 2)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">💾</div>
+              <div class="card-title">完成備份</div>
+            </div>
+            <div class="card-desc">執行並完成一個明確備份任務</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+3 PTS</span>
+            <button class="btn-reload" onclick="addCoins('完成備份', 3)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">📦</div>
+              <div class="card-title">大型整理</div>
+            </div>
+            <div class="card-desc">持續 1 小時以上 / 完成一個特定區域整理</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+5 PTS</span>
+            <button class="btn-reload" onclick="addCoins('大型整理', 5)">儲值</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🏋️</div>
+              <div class="card-title">運動</div>
+            </div>
+            <div class="card-desc">完成一次正式運動</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">+3 PTS</span>
+            <button class="btn-reload" onclick="addCoins('運動', 3)">儲值</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 獎勵兌換區塊 -->
+    <section id="shop">
+      <h2 class="section-title">獎勵兌換商城</h2>
+      <div class="card-grid">
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🍿</div>
+              <div class="card-title">小確幸獎勵</div>
+            </div>
+            <div class="card-desc">小型娛樂 / 飲料 / 零食</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-10 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('小確幸獎勵', 10)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">👛</div>
+              <div class="card-title">新皮夾</div>
+            </div>
+            <div class="card-desc">更換高品質隨身皮夾</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-20 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('新皮夾', 20)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🪑</div>
+              <div class="card-title">露營設備</div>
+            </div>
+            <div class="card-desc">折疊露營椅 + 規劃收納位置</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-70 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('露營設備', 70)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">✨</div>
+              <div class="card-title">美體保養</div>
+            </div>
+            <div class="card-desc">個人除毛護理療程-腋下</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-100 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('美體保養-腋下', 100)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">✨</div>
+              <div class="card-title">美體保養</div>
+            </div>
+            <div class="card-desc">個人除毛護理療程-小腿</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-100 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('美體保養-小腿', 100)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">🦷</div>
+              <div class="card-title">牙齒矯正</div>
+            </div>
+            <div class="card-desc">牙齒矯正啟動預算</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-200 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('牙齒矯正', 200)">兌換</button>
+          </div>
+        </div>
+
+        <div class="game-card">
+          <div>
+            <div class="card-header">
+              <div class="card-icon">📱</div>
+              <div class="card-title">iPad</div>
+            </div>
+            <div class="card-desc">最新款 iPad 平板電腦</div>
+          </div>
+          <div class="card-footer">
+            <span class="pts-badge">-300 PTS</span>
+            <button class="btn-redeem" onclick="redeemCoins('iPad', 300)">兌換</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 歷史紀錄彈出視窗 Modal -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📜 金幣變動歷史紀錄</div>
+        <button class="close-btn" onclick="toggleHistoryModal(false)">&times;</button>
+      </div>
+      <div class="history-list" id="history-list-content">
+        <!-- 紀錄會動態生成於此 -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="clearHistory()">清空歷史</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 讀取 localStorage 資料或預設初值
+    let currentCoins = parseInt(localStorage.getItem('coins')) || 0;
+    let historyData = JSON.parse(localStorage.getItem('coinHistory')) || [];
+
+    // 初始化顯示
+    document.addEventListener('DOMContentLoaded', () => {
+      updateDisplay();
+    });
+
+    // 更新畫面點數顯示與儲存資料
+    function updateDisplay() {
+      document.getElementById('coin-balance').innerText = currentCoins;
+      localStorage.setItem('coins', currentCoins);
+      localStorage.setItem('coinHistory', JSON.stringify(historyData));
+    }
+
+    // 格式化時間
+    function getFormattedTime() {
+      const now = new Date();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const date = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      return `${month}/${date} ${hours}:${minutes}`;
+    }
+
+    // 增加點數（儲值）
+    function addCoins(itemName, amount) {
+      currentCoins += amount;
+      const record = {
+        time: getFormattedTime(),
+        item: itemName,
+        amount: `+${amount}`,
+        total: currentCoins,
+        type: 'plus'
+      };
+      historyData.unshift(record); // 最新紀錄插在最前面
+      updateDisplay();
+    }
+
+    // 扣除點數（兌換）
+    function redeemCoins(itemName, amount) {
+      if (currentCoins < amount) {
+        alert('累積金幣不足，無法兌換！快去完成任務賺取點數吧！');
+        return;
+      }
+      currentCoins -= amount;
+      const record = {
+        time: getFormattedTime(),
+        item: itemName,
+        amount: `-${amount}`,
+        total: currentCoins,
+        type: 'minus'
+      };
+      historyData.unshift(record);
+      updateDisplay();
+      alert(`成功兌換【${itemName}】！`);
+    }
+
+    // 手動修正點數
+    function correctCoins() {
+      const input = prompt('請輸入修正後的總點數：', currentCoins);
+      if (input !== null && !isNaN(input) && input.trim() !== '') {
+        const newTotal = parseInt(input);
+        const diff = newTotal - currentCoins;
+        currentCoins = newTotal;
+
+        const diffString = diff >= 0 ? `+${diff}` : `${diff}`;
+        const record = {
+          time: getFormattedTime(),
+          item: '[手動修正]',
+          amount: diffString,
+          total: currentCoins,
+          type: diff >= 0 ? 'plus' : 'minus'
+        };
+        historyData.unshift(record);
+        updateDisplay();
+      }
+    }
+
+    // 開啟/關閉歷史紀錄Modal
+    function toggleHistoryModal(show) {
+      const modal = document.getElementById('history-modal');
+      if (show) {
+        renderHistory();
+        modal.style.display = 'flex';
+      } else {
+        modal.style.display = 'none';
+      }
+    }
+
+    // 渲染歷史紀錄內容
+    function renderHistory() {
+      const historyList = document.getElementById('history-list-content');
+      if (historyData.length === 0) {
+        historyList.innerHTML = '<div style="text-align: center; color: #888; margin-top: 20px;">尚無歷史紀錄</div>';
+        return;
+      }
+
+      let html = '';
+      historyData.forEach(item => {
+        html += `
+          <div class="history-item">
+            <div>
+              <strong>${item.item}</strong> 
+              <span class="time">(${item.time})</span>
+            </div>
+            <div>
+              <span class="${item.type}">${item.amount}</span> 
+              <span style="color: #666; font-size: 11px;">(餘額: ${item.total})</span>
+            </div>
+          </div>
+        `;
+      });
+      historyList.innerHTML = html;
+    }
+
+    // 清空歷史紀錄
+    function clearHistory() {
+      if (confirm('確定要清空所有歷史紀錄嗎？（金幣數量不會被重置）')) {
+        historyData = [];
+        updateDisplay();
+        renderHistory();
+      }
+    }
+  </script>
+</body>
+</html>
