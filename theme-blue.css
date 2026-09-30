@@ -63,6 +63,9 @@
   --input-bg: #faf9fd;
 
   /* 歷史紀錄 */
+  --history-title:#19448e;
+  --history-text:#19448e;
+  --history-time:#007bbb;
   --history-plus: #2e7d32;
   --history-minus: #c62828;
 

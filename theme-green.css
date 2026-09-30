@@ -4,7 +4,7 @@
   --text-color: #316745;
   --title-color: #316745;
   --muted-text: #007b43;          /* 次要文字（時間、餘額、空狀態） */
-  --coin-color: #f39800;
+  --coin-color: #028760;
 
   /* 導覽列 */
   --nav-bg: #47885e;
@@ -63,6 +63,9 @@
   --input-bg: #faf9fd;
 
   /* 歷史紀錄 */
+  --history-title:#316745;
+  --history-text:#316745;
+  --history-time:#007b43;
   --history-plus: #2e7d32;
   --history-minus: #c62828;
 

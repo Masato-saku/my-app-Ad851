@@ -320,7 +320,7 @@ button {
 .modal-title {
   font-size: 18px;
   font-weight: bold;
-  color: var(--title-color, #333333);
+  color: var(--history-title, #333333);
 }
 
 .close-btn {
@@ -380,21 +380,22 @@ button {
   font-size: 13px;
   border-bottom: 1px dashed var(--card-divider, #eee);
   overflow-wrap: anywhere;
+  color: var(--history-text, #eee);
 }
 
 .history-empty {
   text-align: center;
   margin-top: 20px;
-  color: var(--muted-text, #888);
+  color: var(--history-text, #888);
 }
 
 .history-balance {
   font-size: 11px;
-  color: var(--muted-text, #666);
+  color: var(--history-text, #666);
 }
 
 /* 取代原本三條寫死顏色的規則 */
-.history-item .time  { font-size: 11px; color: var(--muted-text, #888); }
+.history-item .time  { font-size: 11px; color: var(--history-time, #888); }
 .history-item .plus  { color: var(--history-plus, #2e7d32); font-weight: bold; }
 .history-item .minus { color: var(--history-minus, #c62828); font-weight: bold; }
 
