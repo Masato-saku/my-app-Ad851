@@ -1,0 +1,471 @@
+/* ==========================================
+   1. 重置與基礎版型 (Reset & Layout)
+   ========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-padding-top: 70px; } 
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color, #f8f9fa);
+  color: var(--text-color, #333333);
+  background-size: 60px 60px;
+  background-position: 0 0, 30px 30px;
+  padding-bottom: 60px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 0 20px;
+}
+
+/* ==========================================
+   2. 導覽列與區塊標題 (Navbar & Section)
+   ========================================== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--nav-bg, #ffffff);
+  border-bottom: 1px solid var(--nav-border, #e0e0e0);
+  box-shadow: 0 2px 8px var(--shadow-color, rgba(0, 0, 0, 0.05));
+}
+
+.navbar .logo {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  color: var(--nav-logo-color, #333333);
+}
+
+.nav-links a {
+  text-decoration: none;
+  margin-left: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--nav-link-color, #666666);
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.nav-links a:hover {
+  color: var(--primary-color, #5a5acc);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 25px;
+  position: relative;
+  color: var(--title-color, #333333);
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  margin: 8px auto 0;
+  border-radius: 2px;
+  background-color: var(--primary-color, #5a5acc);
+}
+
+/* ==========================================
+   3. 卡片結構與網格 (Cards & Grid)
+   ========================================== */
+.change-color {
+  background: none;
+  border: 0;
+  text-align: center;
+  color: var(--primary-color, #5a5acc);
+  margin-bottom: 20px;
+}
+
+.total-card,
+.game-card {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--card-border, #e0e0e0);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.05));
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 50px;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--card-border-hover, #5a5acc);
+  box-shadow: 0 8px 16px var(--shadow-color-hover, rgba(0, 0, 0, 0.1));
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.card-icon {
+  font-size: 24px;
+  margin-right: 12px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: var(--icon-bg, #f0f0f0);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--card-title-color, #333333);
+  overflow-wrap: anywhere;
+}
+
+.card-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  color: var(--card-desc-color, #666666);
+  overflow-wrap: anywhere;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--card-divider, #f0f0f0);
+}
+
+/* ==========================================
+   4. 標籤與按鈕 (Badges & Buttons)
+   ========================================== */
+.pts-badge {
+  font-size: 13px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background-color: var(--badge-bg, #f0f0f0);
+  color: var(--badge-text, #333333);
+}
+
+.type-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: normal;
+}
+
+.badge-always {
+  background-color: var(--badge-always-bg, #e3f2fd);
+  color: var(--badge-always-text, #1976d2);
+}
+
+.badge-once {
+  background-color: var(--badge-once-bg, #fff3e0);
+  color: var(--badge-once-text, #f57c00);
+}
+
+/* 按鈕共用設定 */
+button {
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.btn-redeem, .btn-reload, .btn-history, .btn-danger, .btn-submit, .btn-clear {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.btn-history, .btn-reload, .btn-redeem {
+  background-color: var(--btn-primary-bg, #5a5acc);
+  color: var(--btn-primary-text, #ffffff);
+}
+
+.btn-history:hover, .btn-reload:hover, .btn-redeem:hover {
+  background-color: var(--btn-primary-hover, #4848b8);
+}
+
+.btn-danger {
+  background-color: var(--btn-danger-bg, #e53935);
+  color: var(--btn-danger-text, #ffffff);
+}
+
+.btn-danger:hover {
+  background-color: var(--btn-danger-hover, #d32f2f);
+}
+
+.btn-history {
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+/* ==========================================
+   5. 刪除模式與按鈕 (Delete Mode)
+   ========================================== */
+.btn-toggle-delete.active-delete-mode {
+  animation: pulse-delete 1.5s infinite;
+}
+
+@keyframes pulse-delete {
+  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(211, 47, 47, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+}
+
+.card-delete-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: none;
+  z-index: 10;
+  background-color: var(--btn-danger-bg, #e53935);
+  color: #ffffff;
+}
+
+.delete-mode .card-delete-btn {
+  display: block;
+}
+
+/* ==========================================
+   6. 彈出視窗與表單 (Modal & Forms)
+   ========================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--modal-bg, #ffffff);
+  color: var(--text-color, #333333);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--card-divider, #f0f0f0);
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--title-color, #333333);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--text-color, #666666);
+}
+
+.modal-body {
+  line-height: 1.6;
+  color: var(--text-color, #444);
+  overflow-y: auto;
+  flex: 1;
+  margin-bottom: 15px;
+}
+
+.help-warning{
+  color: var(--warning-text, #d32f2f);
+}
+
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.form-group input, 
+.form-group select, 
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: 1px solid var(--card-border, #ccc);
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-color, #333333);
+}
+
+.history-list {
+  overflow-y: auto;
+  flex: 1;
+  margin-bottom: 15px;
+}
+
+.history-item {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px dashed var(--card-divider, #eee);
+  overflow-wrap: anywhere;
+}
+
+.history-empty {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--muted-text, #888);
+}
+
+.history-balance {
+  font-size: 11px;
+  color: var(--muted-text, #666);
+}
+
+/* 取代原本三條寫死顏色的規則 */
+.history-item .time  { font-size: 11px; color: var(--muted-text, #888); }
+.history-item .plus  { color: var(--history-plus, #2e7d32); font-weight: bold; }
+.history-item .minus { color: var(--history-minus, #c62828); font-weight: bold; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-clear {
+  background-color: var(--btn-secondary-bg, #e0e0e0);
+  color: var(--btn-secondary-text, #333333);
+}
+
+.btn-submit {
+  background-color: var(--btn-primary-bg, #5a5acc);
+  color: var(--btn-primary-text, #ffffff);
+}
+
+/* ==========================================
+   7.主題切換器 (Theme Picker)
+   ========================================== */
+.theme-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.theme-picker-title {
+  font-size: 13px;
+  color: var(--text-color, #666);
+}
+
+.theme-options {
+  display: flex;
+  gap: 8px;
+}
+
+/* 正方形按鈕基礎樣式 */
+.theme-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px; /* 若要正圓形可改 50% */
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.theme-btn:hover {
+  transform: scale(1.15);
+}
+
+/* 當前選中的色塊加上外框 */
+.theme-btn.active {
+  border-color: var(--theme-active-border, #333333);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 各色塊的色彩展示 */
+.theme-btn.theme-purple { background-color: #5a5acc; }
+.theme-btn.theme-red    { background-color: #e53935; }
+.theme-btn.theme-orange { background-color: #fb8c00; }
+.theme-btn.theme-green  { background-color: #43a047; }
+.theme-btn.theme-blue   { background-color: #1e88e5; }
+.theme-btn.theme-brown  { background-color: #6d4c41; }
+.theme-btn.theme-dark   { background-color: #37474f; }
+
+/* ==========================================
+   9. 其他細節CSS
+   ========================================== */
+   .coin-balance{
+    font-size: 20px;
+    color: var(--primary-color, #5a5acc);
+   }
+
+/* ==========================================
+   8. 響應式佈局 (Responsive)
+   ========================================== */
+@media (max-width: 600px) {
+  .navbar .logo {
+    font-size: 15px;
+  }
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}

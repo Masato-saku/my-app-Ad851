@@ -1,0 +1,61 @@
+/* 紫色風格色彩定義檔 */
+:root {
+  --bg-color: #f4f3f9;
+  --text-color: #3d3b54;
+  --title-color: #4a488e;
+  --muted-text: #8a879f;          /* 次要文字（時間、餘額、空狀態） */
+
+  /* 導覽列 */
+  --nav-bg: #5a5acc;
+  --nav-border: #4848b8;
+  --nav-logo-color: #ffffff;
+  --nav-link-color: #e0e0ff;
+  --primary-color: #5a5acc;
+
+  /* 卡片與容器 */
+  --card-bg: #ffffff;
+  --card-border: #dcd8f0;
+  --card-border-hover: #8c82db;
+  --card-title-color: #3d3b54;
+  --card-desc-color: #6a6785;
+  --card-divider: #f0edfa;
+  --icon-bg: #edeaf8;
+
+  /* 陰影 */
+  --shadow-color: rgba(90, 90, 204, 0.08);
+  --shadow-color-hover: rgba(90, 90, 204, 0.18);
+
+  /* 標籤 */
+  --badge-bg: #edeaf8;
+  --badge-text: #5a5acc;
+  --badge-always-bg: #e8e6f8;
+  --badge-always-text: #5a5acc;
+  --badge-once-bg: #fff0f3;
+  --badge-once-text: #e65100;
+
+  /* 按鈕 */
+  --btn-primary-bg: #5a5acc;
+  --btn-primary-hover: #4848b8;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #e5e3f3;
+  --btn-secondary-text: #5a5acc;
+
+  --btn-danger-bg: #e54b64;
+  --btn-danger-hover: #c93b52;
+  --btn-danger-text: #ffffff;
+
+  /* Modal 與 表單 */
+  --modal-bg: #ffffff;
+  --input-bg: #faf9fd;
+
+  /* 歷史紀錄 */
+  --history-plus: #2e7d32;
+  --history-minus: #c62828;
+
+  /* 主題色塊選取外框（深色主題請改成亮色） */
+  --theme-active-border: #333333;
+
+  /* 說明視窗的警告文字 */
+  --warning-text: #d32f2f;
+}
