@@ -205,15 +205,35 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin-right: 5px;
+  margin-top: 5px;
 }
 
-.btn-history, .btn-reload, .btn-redeem {
+.btn-history, .btn-submit {
   background-color: var(--btn-primary-bg, #5a5acc);
   color: var(--btn-primary-text, #ffffff);
 }
 
-.btn-history:hover, .btn-reload:hover, .btn-redeem:hover {
+.btn-history:hover, .btn-submit:hover {
   background-color: var(--btn-primary-hover, #4848b8);
+}
+
+.btn-reload {
+  background-color: var(--btn-reload-bg, #3eb370);
+  color: var(--btn-primary-text, #ffffff);
+}
+
+.btn-reload:hover {
+  background-color: var(--btn-reload-hover, #007b43);
+}
+
+.btn-redeem {
+  background-color: var(--btn-redeem-bg, #8f2e14);
+  color: var(--btn-primary-text, #ffffff);
+}
+
+.btn-redeem:hover {
+  background-color: var(--btn-redeem-hover, #c53d43);
 }
 
 .btn-danger {
@@ -225,10 +245,6 @@ button {
   background-color: var(--btn-danger-hover, #d32f2f);
 }
 
-.btn-history {
-  margin-right: 5px;
-  margin-top: 5px;
-}
 
 /* ==========================================
    5. 刪除模式與按鈕 (Delete Mode)
@@ -288,7 +304,7 @@ button {
   display: flex;
   flex-direction: column;
   background-color: var(--modal-bg, #ffffff);
-  color: var(--text-color, #333333);
+  color: var(--modal-text-color, var(--text-color, #333333));
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
@@ -312,12 +328,11 @@ button {
   border: none;
   font-size: 20px;
   cursor: pointer;
-  color: var(--text-color, #666666);
+  color: var(--modal-text-color, var(--text-color, #666666));
 }
 
 .modal-body {
   line-height: 1.6;
-  color: var(--text-color, #444);
   overflow-y: auto;
   flex: 1;
   margin-bottom: 15px;
@@ -348,7 +363,7 @@ button {
   font-size: 14px;
   border: 1px solid var(--card-border, #ccc);
   background-color: var(--input-bg, #ffffff);
-  color: var(--text-color, #333333);
+  color: var(--modal-text-color, var(--text-color, #333333));
 }
 
 .history-list {
@@ -390,13 +405,13 @@ button {
 }
 
 .btn-clear {
-  background-color: var(--btn-secondary-bg, #e0e0e0);
-  color: var(--btn-secondary-text, #333333);
+  background-color: var(--btn-clear-bg, #e0e0e0);
+  color: var(--btn-clear-text, #333333);
 }
 
-.btn-submit {
-  background-color: var(--btn-primary-bg, #5a5acc);
-  color: var(--btn-primary-text, #ffffff);
+.btn-clear:hover {
+  background-color: var(--btn-clear-hover, #cfcfcf);
+  color: var(--btn-clear-hover-text, #333333);
 }
 
 /* ==========================================
@@ -455,7 +470,7 @@ button {
    ========================================== */
    .coin-balance{
     font-size: 20px;
-    color: var(--primary-color, #5a5acc);
+    color: var(--coin-color, #5a5acc);
    }
 
 /* ==========================================

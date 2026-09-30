@@ -4,6 +4,7 @@
   --text-color: #3d3b54;
   --title-color: #4a488e;
   --muted-text: #8a879f;          /* 次要文字（時間、餘額、空狀態） */
+  --coin-color: #8a879f;
 
   /* 導覽列 */
   --nav-bg: #5a5acc;
@@ -41,12 +42,24 @@
   --btn-secondary-bg: #e5e3f3;
   --btn-secondary-text: #5a5acc;
 
+  --btn-reload-bg: #007b43;
+  --btn-reload-hover: #3eb370;
+
+  --btn-redeem-bg: #5a5acc;
+  --btn-redeem-hover: #4848b8;
+
+  --btn-clear-bg: #e5e3f3;
+  --btn-clear-hover: #4848b8;
+  --btn-clear-text:#5a5acc;
+  --btn-clear-hover-text:#ffffff;
+
   --btn-danger-bg: #e54b64;
   --btn-danger-hover: #c93b52;
   --btn-danger-text: #ffffff;
 
   /* Modal 與 表單 */
   --modal-bg: #ffffff;
+  --modal-text-color: #3d3b54;
   --input-bg: #faf9fd;
 
   /* 歷史紀錄 */

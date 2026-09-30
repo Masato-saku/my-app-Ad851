@@ -1,0 +1,74 @@
+/* 藍色風格色彩定義檔 */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #19448e;
+  --title-color: #19448e;
+  --muted-text: #007b43;          /* 次要文字（時間、餘額、空狀態） */
+  --coin-color: #2ca9e1;
+
+  /* 導覽列 */
+  --nav-bg: #164a84;
+  --nav-border: #2ca9e1;
+  --nav-logo-color: #ffffff;
+  --nav-link-color: #89c3eb;
+  --primary-color: #38a1db;
+
+  /* 卡片與容器 */
+  --card-bg: linear-gradient(135deg, #D1F2FF 0%, #E8FAFF 50%, #ffffff 100%);
+  --card-border: #a0d8ef;
+  --card-border-hover: #38a1db;
+  --card-title-color: #19448e;
+  --card-desc-color: #007bbb;
+  --card-divider: #89c3eb;
+  --icon-bg: #a0d8ef;
+
+  /* 陰影 */
+  --shadow-color: rgba(39, 74, 120, 0.08);
+  --shadow-color-hover: rgba(39, 74, 120, 0.18);
+
+  /* 標籤 */
+  --badge-bg: #a0d8ef;
+  --badge-text: #1e50a2;
+  --badge-always-bg: #e8e6f8;
+  --badge-always-text: #5a5acc;
+  --badge-once-bg: #fff0f3;
+  --badge-once-text: #e65100;
+
+  /* 按鈕 */
+  --btn-primary-bg: #5a5acc;
+  --btn-primary-hover: #4848b8;
+  --btn-primary-text: #ffffff;
+
+  --btn-secondary-bg: #e5e3f3;
+  --btn-secondary-text: #5a5acc;
+
+  --btn-reload-bg: #007b43;
+  --btn-reload-hover: #3eb370;
+
+  --btn-redeem-bg: #8f2e14;
+  --btn-redeem-hover: #c53d43;
+
+  --btn-clear-bg: #89c3eb;
+  --btn-clear-hover: #19448e;
+  --btn-clear-text:#19448e;
+  --btn-clear-hover-text:#ffffff;
+
+  --btn-danger-bg: #e54b64;
+  --btn-danger-hover: #c93b52;
+  --btn-danger-text: #ffffff;
+
+  /* Modal 與 表單 */
+  --modal-bg: #ffffff;
+  --modal-text-color: #3d3b54;
+  --input-bg: #faf9fd;
+
+  /* 歷史紀錄 */
+  --history-plus: #2e7d32;
+  --history-minus: #c62828;
+
+  /* 主題色塊選取外框（深色主題請改成亮色） */
+  --theme-active-border: #333333;
+
+  /* 說明視窗的警告文字 */
+  --warning-text: #d32f2f;
+}
