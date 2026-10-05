@@ -85,6 +85,17 @@
             <button class="btn-history btn-danger btn-toggle-delete" id="btn-delete-shop" data-type="shop" onclick="toggleDeleteMode('shop', event)">刪除獎勵卡</button>
           </div>
         </div>
+        <div class="total-card">
+          <div>
+            <div class="card-header">
+              <div class="card-title">資料備份</div>
+            </div>
+            <button class="btn-history" onclick="exportBackup()">匯出備份</button>
+            <button class="btn-history" onclick="openImportPicker()">匯入備份</button>
+            <!-- 隱藏的選檔欄位，由「匯入備份」按鈕觸發 -->
+            <input type="file" id="import-file-input" accept=".json,application/json" hidden onchange="importBackup(this)">
+          </div>
+        </div>
       </div>
     </section>
 
