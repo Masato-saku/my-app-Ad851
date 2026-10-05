@@ -421,6 +421,112 @@ function closeAllModals() {
 }
 
 // ==========================================
+// 備份與匯入
+// ==========================================
+const BACKUP_APP_ID = 'LifeCoin';
+const BACKUP_VERSION = 1;
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+// 匯出：把所有資料打包成一個 JSON 檔下載
+function exportBackup() {
+  const now = new Date();
+  const payload = {
+    app: BACKUP_APP_ID,
+    version: BACKUP_VERSION,
+    exportedAt: now.toISOString(),
+    coins: currentCoins,
+    history: historyData,
+    tasks: tasksData,
+    rewards: rewardsData
+  };
+
+  const stamp = `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}-${pad2(now.getHours())}${pad2(now.getMinutes())}`;
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lifecoin-backup-${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  showToast('已匯出備份檔，請確認它存在「下載」或「檔案」App 中');
+}
+
+// 按「匯入備份」按鈕時，打開隱藏的選檔視窗
+function openImportPicker() {
+  document.getElementById('import-file-input').click();
+}
+
+// 讓每張卡片的 id 都不重複（防止備份檔被手動改壞）
+function uniqueIds(list, usedIds) {
+  return list.map(card => {
+    let id = card.id;
+    while (usedIds.has(id)) id++;
+    usedIds.add(id);
+    return { ...card, id };
+  });
+}
+
+// 匯入：讀取選到的 JSON 檔，確認後覆蓋目前資料
+async function importBackup(input) {
+  const file = input.files && input.files[0];
+  input.value = '';   // 清空選擇，之後再選同一個檔案也能觸發
+  if (!file) return;
+
+  let data;
+  try {
+    data = JSON.parse(await file.text());
+  } catch {
+    alert('讀取失敗：這不是有效的備份檔（無法解析內容）。');
+    return;
+  }
+
+  if (!data || data.app !== BACKUP_APP_ID) {
+    alert('這不是 LifeCoin 的備份檔，已取消匯入。');
+    return;
+  }
+  if (typeof data.version === 'number' && data.version > BACKUP_VERSION) {
+    alert('這份備份檔來自較新的版本，請先更新網頁後再匯入。');
+    return;
+  }
+
+  const coins = Number(data.coins);
+  if (!Number.isFinite(coins) || coins < 0) {
+    alert('備份檔內的金幣數量不正確，已取消匯入。');
+    return;
+  }
+
+  const newHistory = cleanHistory(data.history).slice(0, MAX_HISTORY);
+  const used = new Set();
+  const newTasks = uniqueIds(cleanCards(data.tasks, [], false), used);
+  const newRewards = uniqueIds(cleanCards(data.rewards, [], true), used);
+
+  const when = data.exportedAt ? new Date(data.exportedAt) : null;
+  const whenText = when && !isNaN(when) ? `${when.getFullYear()}/${pad2(when.getMonth() + 1)}/${pad2(when.getDate())} ${pad2(when.getHours())}:${pad2(when.getMinutes())}` : '未知';
+
+  const ok = confirm(
+    `備份時間：${whenText}\n` +
+    `金幣 ${Math.trunc(coins)}、任務卡 ${newTasks.length} 張、獎勵卡 ${newRewards.length} 張、歷史 ${newHistory.length} 筆\n\n` +
+    `匯入會「完全覆蓋」目前這台裝置上的資料，確定要繼續嗎？\n` +
+    `（建議先按「匯出備份」保存目前的資料）`
+  );
+  if (!ok) return;
+
+  currentCoins = Math.trunc(coins);
+  historyData = newHistory;
+  tasksData = newTasks;
+  rewardsData = newRewards;
+
+  exitDeleteMode();   // 同時重新渲染任務與獎勵
+  updateDisplay();    // 更新金幣顯示並寫入儲存
+  showToast('匯入完成！');
+}
+
+// ==========================================
 // 主題切換
 // ==========================================
 function isValidTheme(name) {
@@ -512,3 +618,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeAllModals();
   });
 });
+
+// ==========================================
+// PWA：註冊 Service Worker（離線與安裝用）
+// ==========================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
