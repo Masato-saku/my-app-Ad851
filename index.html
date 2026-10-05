@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#5a5acc">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="冒險生活指南">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>任務與兌換商城</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🪙</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <link id="theme-style" rel="stylesheet" href="theme-purple.css">
+
+  <!-- 在畫面繪製前先套用已儲存的主題，避免重新整理時閃一下紫色 -->
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('user-selected-theme');
+        if (t && /^theme-[a-z]+\.css$/.test(t)) {
+          document.getElementById('theme-style').setAttribute('href', t);
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- 導覽列 -->
+  <nav class="navbar">
+    <div class="logo">⚔️ 冒險生活指南</div>
+    <div class="nav-links">
+      <a href="#help" onclick="toggleHelpModal(true); return false;">使用說明</a>
+      <a href="#tasks">每日任務</a>
+      <a href="#shop">獎勵商城</a>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <!-- 統計列表區塊 -->
+    <section id="total">
+    <!-- 色彩切換選單 -->
+    <div class="theme-picker">
+      <span class="theme-picker-title">切換主題色：</span>
+      <div class="theme-options">
+        <!-- data-theme 裡面填入對應的主題 CSS 檔名 -->
+        <button type="button" class="theme-btn theme-purple active" data-theme="theme-purple.css" title="預設紫"></button>
+        <button type="button" class="theme-btn theme-red" data-theme="theme-red.css" title="紅色"></button>
+        <button type="button" class="theme-btn theme-orange" data-theme="theme-orange.css" title="橙色"></button>
+        <button type="button" class="theme-btn theme-green" data-theme="theme-green.css" title="綠色"></button>
+        <button type="button" class="theme-btn theme-blue" data-theme="theme-blue.css" title="藍色"></button>
+        <button type="button" class="theme-btn theme-brown" data-theme="theme-brown.css" title="咖啡色"></button>
+        <button type="button" class="theme-btn theme-dark" data-theme="theme-dark.css" title="黑灰色"></button>
+      </div>
+    </div>
+
+
+
+      <div class="card-grid">
+
+        <div class="total-card">
+          <div>
+            <div class="card-header">
+              <div class="card-title">目前累計金幣：<span id="coin-balance" class="coin-balance">0</span> Coin</div>
+            </div>
+            <button class="btn-history" onclick="toggleHistoryModal(true)">歷史記錄</button>
+            <button class="btn-history btn-danger" onclick="correctCoins()">修正金額</button>
+          </div>
+        </div>
+
+        <div class="total-card">
+          <div>
+            <div class="card-header">
+              <div class="card-title">任務項目</div>
+            </div>
+            <button class="btn-history" onclick="openAddTaskModal()">新增任務卡</button>
+            <button class="btn-history btn-danger btn-toggle-delete" id="btn-delete-tasks" data-type="tasks" onclick="toggleDeleteMode('tasks', event)">刪除任務卡</button>
+          </div>
+        </div>
+
+        <div class="total-card">
+          <div>
+            <div class="card-header">
+              <div class="card-title">獎勵項目</div>
+            </div>
+            <button class="btn-history" onclick="openAddRewardModal()">新增獎勵卡</button>
+            <button class="btn-history btn-danger btn-toggle-delete" id="btn-delete-shop" data-type="shop" onclick="toggleDeleteMode('shop', event)">刪除獎勵卡</button>
+          </div>
+        </div>
+      <div class="total-card">
+          <div>
+            <div class="card-header">
+              <div class="card-title">資料備份</div>
+            </div>
+            <button class="btn-history" onclick="exportBackup()">匯出備份</button>
+            <button class="btn-history" onclick="openImportPicker()">匯入備份</button>
+            <!-- 隱藏的選檔欄位，由「匯入備份」按鈕觸發 -->
+            <input type="file" id="import-file-input" accept=".json,application/json" hidden onchange="importBackup(this)">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <br/><br/>
+
+    <!-- 任務列表區塊 -->
+    <section id="tasks">
+      <h2 class="section-title">獲得金幣任務</h2>
+      <div class="card-grid" id="tasks-container">
+        <!-- 任務卡片動態渲染於此 -->
+      </div>
+    </section>
+
+    <!-- 獎勵兌換區塊 -->
+    <section id="shop">
+      <h2 class="section-title">獎勵兌換商城</h2>
+      <div class="card-grid" id="rewards-container">
+        <!-- 獎勵卡片動態渲染於此 -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 歷史紀錄 Modal -->
+  <div class="modal-overlay" id="history-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📜 金幣變動歷史紀錄</div>
+        <button class="close-btn" onclick="toggleHistoryModal(false)">&times;</button>
+      </div>
+      <div class="history-list" id="history-list-content"></div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="clearHistory()">清空歷史</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 使用說明 Modal -->
+  <div class="modal-overlay" id="help-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📖 使用說明</div>
+        <button class="close-btn" onclick="toggleHelpModal(false)">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>
+          <span class="help-warning">
+            <b>注意事項：</b><br>
+            內容僅暫存在裝置中，清快取會導致資料消失。<br>
+            因此電腦與手機不共通。用手機記錄便只能使用手機繼續。<br>
+          </span>
+          <br>
+          <b>任務卡：</b><br>
+          新增你想做的事或目標，金額照難易度定價(建議諮詢AI)。<br>
+          <br>
+          <b>獎勵卡：</b><br>
+          新增獎勵，不限食物或高額獎品，也可以是旅行，任何想得到對自己可以達到滿足效果或是想爭取的動力的事物。<br>
+          可分為小獎勵、中獎勵及大獎勵，由自己決定，金額照難易度定價(建議諮詢AI)<br>
+          <br>
+          <b>新增卡片：</b><br>
+          要有下好離手的決心，無法對卡片進行修改，以免發生不停改金額的事。若不小心打錯字，只能刪除重來。<br>
+          定價建議向AI諮詢，詳細說明任務對自己來說困難度在哪裡?為什麼想要做這個任務。<br>
+          <br>
+          <b>新增獎勵：</b><br>
+          也可以向AI說明，該獎勵對自己的重要性、糾結著要不要買或是其他理由。<br>
+          愈詳細AI能評斷的定價會愈合理。<br>
+          要是覺得太簡單可以向AI提出想提高難度，並跟他討論自己能力的可行性再改，否則做不到只是增加挫敗感。<br>
+          不要太過於討價還價，因為AI被盧久了就會順從你的渴望，那就沒意義了。<br>
+          <br>
+          ©Ed Brawley<br>
+          
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-clear" onclick="toggleHelpModal(false)">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 新增任務/獎勵 Modal -->
+  <div class="modal-overlay" id="add-card-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="add-card-title">新增卡片</div>
+        <button class="close-btn" onclick="closeAddCardModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="card-type-input">
+        <div class="form-group">
+          <label>Emoji 圖示：</label>
+          <input type="text" id="card-icon-input" placeholder="例如：🎨、☕">
+        </div>
+        <div class="form-group">
+          <label>名稱：</label>
+          <input type="text" id="card-name-input" placeholder="請輸入名稱" maxlength="40">
+        </div>
+        <div class="form-group">
+          <label>描述說明：</label>
+          <textarea id="card-desc-input" rows="3" placeholder="請輸入詳細描述" maxlength="200"></textarea>
+        </div>
+        <div class="form-group">
+          <label>點數/金額：</label>
+          <input type="number" id="card-pts-input" placeholder="請輸入點數數量" min="1">
+        </div>
+        <div class="form-group" id="reward-mode-group" style="display: none;">
+          <label>兌換模式：</label>
+          <select id="card-mode-input">
+            <option value="always">常態（兌換後保留）</option>
+            <option value="once">單次（兌換後自動刪除）</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-submit" onclick="submitNewCard()">確認新增</button>
+      </div>
+    </div>
+  </div>
+<!-- 外部引用 JS 檔 -->
+  <script src="app.js"></script>
+  
+</body>
+</html>
