@@ -1,0 +1,25 @@
+{
+  "id": "./",
+  "name": "Quote Card｜私人語錄收藏",
+  "short_name": "Quote Card",
+  "description": "本機語錄收藏與 TAG 分類",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fafcfc",
+  "theme_color": "#005073",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
