@@ -1,1 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>一日/半日旅記｜Travel Card</title>
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#005073">
+  <link rel="apple-touch-icon" href="./icon-192.png">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&family=Slabo+27px&display=swap" rel="stylesheet">
+
+  <!-- 在畫面繪製前先套用主題，避免暗色模式重新整理時閃白 -->
+  <script>
+    try {
+      var t = localStorage.getItem('travel_cards_theme');
+      if (!t) t = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  </script>
+
+  <style>
+    /* ============================================================
+       顏色變數
+       亮色在 :root，暗色在下面的 :root[data-theme=dark]。
+       想改任何顏色，只要改這兩組變數就好，下面的規則都是引用它們。
+       ============================================================ */
+    :root {
+      --ink: #005073;                 /* 主要文字色（標題、一般文字） */
+      --accent: #099BC8;              /* 強調色（選單 hover、啟用中的區域） */
+      --page: #fff;                   /* 頁面底色 */
+
+      /* 蓋在地圖背景上的半透明遮罩（RGB 數字，不含 rgba） */
+      --veil: 255,255,255;
+      --veil-top: .5;
+      --veil-bottom: .1;
+      --veil-menu: .5;
+
+      --card-bg: rgba(150,190,200,.5);/* 卡片底色 */
+      --card-line: #005073;           /* 卡片邊框、工具列虛線 */
+      --soft: #e9f3f5;                /* TAG 管理面板底色 */
+
+      --pill-bg: #fff;                /* TAG 按鈕底色 */
+      --pill-line: #bfd4d9;
+      --pill-on-bg: #005073;          /* 啟用中的 TAG 底色 */
+      --pill-on-ink: #fff;            /* 啟用中的 TAG 文字色 */
+
+      --btn-bg: #005073;              /* 一般按鈕底色 */
+      --btn-ink: #fff;                /* 一般按鈕文字色 */
+      --btn-hover-bg: #099BC8;
+      --btn-hover-ink: #fff;
+      --danger-bg: #c94c4c;           /* 刪除按鈕 */
+      --danger-hover: #a03939;
+      --map-bg: #0F7485;              /* Google Maps 地點按鈕 */
+      --map-hover: #5BA8B5;
+
+      --field-bg: #fff;               /* 輸入框底色 */
+      --field-ink: #173e4a;           /* 輸入框文字色 */
+      --dialog-bg: #fff;              /* 編輯視窗底色 */
+
+      --link: #2F16A1;                /* 超連結色 */
+      --link-hover: #866FEB;
+
+      --chip-bg: rgba(255,255,255,.6);/* 卡片上的 #tag 小標籤 */
+      --chip-line: #bad0d5;
+      --shadow: rgba(0,0,0,.08);
+    }
+
+    :root[data-theme=dark] {
+      color-scheme: dark;
+      --ink: #d6eef3;                 /* 暗色：主要文字色 */
+      --accent: #5cc8ea;
+      --page: #0f1c21;
+
+      --veil: 15,28,33;
+      --veil-top: .85;
+      --veil-bottom: .6;
+      --veil-menu: .7;
+
+      --card-bg: rgba(30,66,77,.6);
+      --card-line: #3d6b78;
+      --soft: #16323b;
+
+      --pill-bg: #142a31;
+      --pill-line: #2f5560;
+      --pill-on-bg: #5cc8ea;
+      --pill-on-ink: #06222b;
+
+      --btn-bg: #2c7f99;
+      --btn-ink: #fff;
+      --btn-hover-bg: #5cc8ea;
+      --btn-hover-ink: #06222b;
+      --danger-bg: #b24545;
+      --danger-hover: #d05a5a;
+      --map-bg: #1b8196;
+      --map-hover: #4fb3c6;
+
+      --field-bg: #0f1c21;
+      --field-ink: #e3f1f4;           /* 暗色：輸入框文字色 */
+      --dialog-bg: #12262d;
+
+      --link: #8ec5ff;                /* 暗色：超連結色 */
+      --link-hover: #bcdcff;
+
+      --chip-bg: rgba(255,255,255,.08);
+      --chip-line: #2f5560;
+      --shadow: rgba(0,0,0,.4);
+    }
+
+    /* ============================================================
+       基本設定
+       ============================================================ */
+    * { box-sizing: border-box; }          /* 加 padding 不會爆版 */
+    [hidden] { display: none !important; }
+
+    html { font-size: 14px; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+      font-family: "Noto Sans TC", "Slabo", serif;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image:
+        linear-gradient(to top, rgba(var(--veil), var(--veil-top)) 70%, rgba(var(--veil), var(--veil-bottom)) 100%),
+        url(bg_map.jpg);
+      background-repeat: no-repeat;
+      background-position: center top;
+      background-size: 100% auto;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    /* ============================================================
+       頂部選單
+       ============================================================ */
+    .menu {
+      display: flex;
+      width: 100%;
+      padding: 30px 0;
+    }
+
+    .menu_L {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      padding: 90px 0 0 0;
+      width: 30%;
+      height: 340px;
+    }
+
+    /* 選單項目（區域、Backup、Load、+ Add、主題切換共用） */
+    .mi {
+      display: block;
+      width: 100%;
+      padding: 0 20px 0 0;
+      line-height: 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      font-family: inherit;
+      text-align: right;
+      color: var(--ink);
+      border: 0;
+      background: none;
+      cursor: pointer;
+    }
+
+    .mi:hover,
+    .mi.active { color: var(--accent); }
+
+    .mi:hover {
+      background: linear-gradient(to left, rgba(var(--veil), .5) 50%, rgba(var(--veil), 0) 100%);
+    }
+
+    .menu_R {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 70%;
+      height: 340px;
+      background: linear-gradient(to right, rgba(var(--veil), var(--veil-menu)) 70%, rgba(var(--veil), 0) 100%);
+    }
+
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 0;
+      padding: 80px 0 0 20px;
+      width: 100%;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .header span { letter-spacing: .5em; }
+
+    /* ============================================================
+       TAG 區（寬度與下方卡片區對齊）
+       ============================================================ */
+    .tag-area {
+      width: 80%;
+      margin: 0 auto 6px;
+      padding: 0 30px 15px;
+      border-bottom: 1px solid var(--card-line);
+    }
+
+    .tag-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tag-top h2 { margin: 0; font-size: 1.15rem; }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .tag-pill {
+      border: 1px solid var(--pill-line);
+      border-radius: 30px;
+      padding: 5px 13px;
+      background: var(--pill-bg);
+      color: var(--ink);
+    }
+
+    .tag-pill:hover { border-color: var(--accent); }
+
+    .tag-pill.active {
+      background: var(--pill-on-bg);
+      border-color: var(--pill-on-bg);
+      color: var(--pill-on-ink);
+    }
+
+    .tag-manager {
+      margin-top: 15px;
+      padding: 14px;
+      background: var(--soft);
+      border-radius: 9px;
+    }
+
+    .manager-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .tag-manage-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .tag-manage-row span { min-width: 100px; }
+
+    .tag-manage-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+      gap: 6px 16px;
+    }
+
+    .tag-manage-list .tag-manage-row { margin: 0; padding: 5px 0; }
+
+    .tag-manage-list .tag-manage-row span {
+      flex: 1;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    /* ============================================================
+       卡片列表
+       ============================================================ */
+    .wrap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      justify-content: center;
+      gap: 30px;
+      width: 80%;
+      margin: 0 auto;
+      padding: 0 30px;
+    }
+
+    .travelCard {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin: 16px auto;
+      padding: 24px;
+      border: 1px solid var(--card-line);
+      border-radius: 8px;
+      background: var(--card-bg);
+      transition: .2s ease;            /* 浮動感 */
+    }
+
+    .travelCard:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .card-toolbar {
+      text-align: right;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--card-line);
+    }
+
+    .card-content { min-width: 0; }
+
+    /* 卡片標題（地點） */
+    .Location_tit {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      line-height: 2.4rem;
+      letter-spacing: .5em;
+      color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+
+    /* 欄位小標題（【日期】【Google Maps】…） */
+    .stit {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 2em;
+      color: var(--ink);
+    }
+
+    /* 欄位內容 */
+    .content {
+      display: block;
+      width: 100%;
+      margin: 0 0 20px 0;
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1.8em;
+      letter-spacing: .03em;
+      white-space: pre-wrap;           /* 保留你輸入時的換行 */
+      overflow-wrap: anywhere;
+    }
+
+    /* 內容含區塊標籤（p、div、li…）時改用一般換行 */
+    .content.html-mode { white-space: normal; }
+
+    .content p { margin: .4em 0; }
+
+    .content a {
+      color: var(--link);
+      text-decoration: underline;
+    }
+
+    .content a:hover { color: var(--link-hover); }
+
+    /* Google Maps 欄位：連結顯示成按鈕，多地點並排 */
+    .content.maps {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      white-space: normal;
+    }
+
+    .content a.location-btn {
+      display: inline-block;
+      padding: 5px 12px;
+      background: var(--map-bg);
+      color: #fff;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: .2s;
+    }
+
+    .content a.location-btn:hover { background: var(--map-hover); color: #fff; }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .card-tag {
+      font-size: 12px;
+      padding: 2px 9px;
+      background: var(--chip-bg);
+      border: 1px solid var(--chip-line);
+      border-radius: 20px;
+    }
+
+    .muted { opacity: .65; }
+
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 10px;
+    }
+
+    /* ============================================================
+       按鈕
+       ============================================================ */
+    .edit-btn,
+    .delete-btn,
+    .primary {
+      padding: 5px 12px;
+      border: 0;
+      border-radius: 4px;
+      background: var(--btn-bg);
+      color: var(--btn-ink);
+      font-family: inherit;
+      transition: .2s;
+    }
+
+    .edit-btn:hover,
+    .primary:hover {
+      background: var(--btn-hover-bg);
+      color: var(--btn-hover-ink);
+    }
+
+    .delete-btn {
+      margin-left: 10px;
+      background: var(--danger-bg);
+      color: #fff;
+    }
+
+    .delete-btn:hover { background: var(--danger-hover); }
+
+    .secondary {
+      padding: 5px 12px;
+      border: 1px solid var(--pill-line);
+      border-radius: 5px;
+      background: var(--pill-bg);
+      color: var(--ink);
+    }
+
+    /* ============================================================
+       新增／編輯視窗
+       ============================================================ */
+    dialog {
+      width: min(640px, 94vw);
+      max-height: 90vh;
+      overflow: auto;
+      padding: 25px;
+      border: 1px solid var(--pill-line);
+      border-radius: 12px;
+      background: var(--dialog-bg);
+      color: var(--ink);
+      box-shadow: 0 15px 60px rgba(0,0,0,.2);
+    }
+
+    dialog::backdrop { background: rgba(0,43,58,.47); }
+
+    dialog h2 { margin-top: 0; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 13px 0;
+    }
+
+    .field label { font-weight: 700; }
+
+    .field input,
+    .field textarea,
+    .tag-manager input {
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid var(--pill-line);
+      border-radius: 5px;
+      background: var(--field-bg);
+      color: var(--field-ink);
+    }
+
+    .field textarea {
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .check-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .check-tags label {
+      padding: 4px 10px;
+      border: 1px solid var(--pill-line);
+      border-radius: 20px;
+      background: var(--pill-bg);
+      font-weight: 400;
+      cursor: pointer;
+    }
+
+    .check-tags input { accent-color: var(--accent); }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .note { font-size: 12px; opacity: .7; }
+
+    .footer {
+      text-align: center;
+      padding: 20px;
+      opacity: .7;
+    }
+
+    /* ============================================================
+       響應式
+       ============================================================ */
+    @media (max-width: 1100px) {            /* 平板：2 欄 */
+      .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 768px) {             /* 手機 */
+      .menu { flex-direction: column; }
+
+      .menu_L,
+      .menu_R {
+        width: 100%;
+        height: auto;
+        padding: 0;
+      }
+
+      .menu_L {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .mi {
+        width: auto;
+        padding: 0 14px;
+        text-align: center;
+      }
+
+      .mi:hover {
+        background: linear-gradient(to top, rgba(var(--veil), .5) 70%, rgba(var(--veil), 0) 100%);
+      }
+
+      .menu_R {
+        background: linear-gradient(to bottom, rgba(var(--veil), var(--veil-menu)) 70%, rgba(var(--veil), 0) 100%);
+      }
+
+      .header { padding-bottom: 30px; }
+
+      .tag-area { width: 100%; padding: 0 16px 12px; }
+
+      .wrap {
+        grid-template-columns: 1fr;
+        width: 100%;
+        padding: 0 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 頂部選單 -->
+  <div class="menu">
+    <nav class="menu_L" aria-label="主選單">
+      <!-- 區域快捷：點一下篩選同名 TAG，再點一次取消 -->
+      <button type="button" class="mi region" data-tag="North">North</button>
+      <button type="button" class="mi region" data-tag="South">South</button>
+      <button type="button" class="mi region" data-tag="Central">Central</button>
+      <button type="button" class="mi region" data-tag="Islands">Islands</button>
+
+      <button type="button" class="mi" id="exportBtn">Backup</button>
+      <label class="mi" for="importFile">Load</label>
+      <input id="importFile" type="file" accept=".txt,.json" hidden>
+      <button type="button" class="mi" id="addCardBtn">+ Add</button>
+      <button type="button" class="mi" id="themeBtn">🌙 Dark</button>
+    </nav>
+
+    <div class="menu_R">
+      <h1 class="header">
+        <span>Travel</span>
+        <span>Card</span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- TAG 篩選與管理 -->
+  <section class="tag-area">
+    <div class="tag-top">
+      <h2>TAG <span id="tagCount" class="muted"></span></h2>
+      <button id="manageBtn" class="secondary" type="button">⚙ 管理 TAG</button>
+    </div>
+
+    <div id="tagFilters" class="tags"></div>
+
+    <div id="tagManager" class="tag-manager" hidden>
+      <div class="manager-heading">
+        <strong>管理 TAG</strong>
+        <button id="closeTagManager" class="secondary" type="button">✕ 關閉</button>
+      </div>
+      <div class="tag-manage-row">
+        <input id="newTag" placeholder="新增 TAG 名稱" maxlength="40">
+        <button id="createTag" class="primary" type="button">新增</button>
+      </div>
+      <div id="tagManageList" class="tag-manage-list"></div>
+      <p class="note">重新命名會同步更新所有卡片；刪除 TAG 只會移除分類，不會刪除卡片。</p>
+    </div>
+  </section>
+
+  <!-- 卡片列表（由 app.js 產生） -->
+  <main class="wrap" id="cardContainer"></main>
+
+  <div class="footer">
+    MEMO:next time +footer copyright &amp; update tag &amp; invisible funcion<br>
+    TRAVEL CARD · 本機儲存 · 請定期備份
+  </div>
+
+  <!-- 新增／編輯視窗：欄位依照原本 +Add 的模板 -->
+  <dialog id="cardDialog">
+    <form id="cardForm">
+      <h2 id="dialogTitle">新增旅記</h2>
+
+      <div class="field">
+        <label for="cardTitle">【地點】</label>
+        <input id="cardTitle" maxlength="200" required placeholder="例如：台北市立天文科學教育館">
+      </div>
+
+      <!-- 模板欄位由 app.js 產生 -->
+      <div id="editSections"></div>
+
+      <div class="field">
+        <label>TAG（可複選）</label>
+        <div id="editTags" class="check-tags"></div>
+      </div>
+
+      <p class="note">各欄位支援常用 HTML 排版與安全超連結（例如 &lt;a href="…"&gt;名稱&lt;/a&gt;、&lt;span style="color:red"&gt;重點&lt;/span&gt;）；純文字網址會自動轉為連結。Google Maps 欄位的連結會顯示成按鈕。為安全起見不執行腳本。</p>
+
+      <div class="dialog-actions">
+        <button type="button" id="cancelDialog" class="secondary">取消</button>
+        <button type="submit" class="primary">儲存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
