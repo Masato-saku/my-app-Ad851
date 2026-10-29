@@ -178,16 +178,10 @@ function addTag(){
 }
 $('createTag').onclick=addTag;$('newTag').onkeydown=e=>{if(e.key==='Enter')addTag()};
 
-// 修正 8：優先使用系統分享（iOS 主畫面 App 較可靠），不支援時退回下載。
-$('exportBtn').onclick=async()=>{
+// 直接下載 .txt 檔（內容是 JSON，之後用 Load 匯入）
+$('exportBtn').onclick=()=>{
  const data=JSON.stringify({format:'QuoteCard',version:1,exportedAt:new Date().toISOString(),...state},null,2);
  const name='QuoteCard_Backup_'+new Date().toISOString().slice(0,10)+'.txt';
- try{
-  const file=new File([data],name,{type:'text/plain'});
-  if(navigator.canShare&&navigator.canShare({files:[file]})){
-   await navigator.share({files:[file],title:name});return;
-  }
- }catch(err){if(err&&err.name==='AbortError')return}
  const blob=new Blob([data],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(url),10000);
