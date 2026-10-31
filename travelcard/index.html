@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>一日/半日旅記｜Travel Card</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#005073">
   <link rel="apple-touch-icon" href="./icon-192.png">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&family=Slabo+27px&display=swap" rel="stylesheet">
 
   <!-- 在畫面繪製前先套用主題，避免暗色模式重新整理時閃白 -->
   <script>
@@ -24,189 +19,262 @@
   <style>
     /* ============================================================
        顏色變數
-       亮色在 :root，暗色在下面的 :root[data-theme=dark]。
+       亮色在 :root（白底＋藍色），暗色在下面的 :root[data-theme=dark]（柴色系）。
        想改任何顏色，只要改這兩組變數就好，下面的規則都是引用它們。
        ============================================================ */
     :root {
-      --ink: #005073;                 /* 主要文字色（標題、一般文字） */
-      --accent: #099BC8;              /* 強調色（選單 hover、啟用中的區域） */
-      --page: #fff;                   /* 頁面底色 */
+      --page: #ffffff;                /* 頁面底色 */
+      --ink: #333333;                 /* 一般文字色 */
+      --title: #19448e;               /* 標題、欄位小標題色 */
+      --body: #555555;                /* 卡片內文色 */
+      --muted: #666666;               /* 次要文字（副標、頁尾） */
+      --accent: #1f6fd0;              /* 強調色（hover、連結） */
+      --line: #f0f0f0;                /* 分隔線 */
 
-      /* 蓋在地圖背景上的半透明遮罩（RGB 數字，不含 rgba） */
-      --veil: 255,255,255;
-      --veil-top: .5;
-      --veil-bottom: .1;
-      --veil-menu: .5;
+      --card-bg: #ffffff;             /* 卡片底色 */
+      --card-line: #e6eaf2;           /* 卡片邊框 */
+      --shadow: rgba(25,68,142,.1);   /* 卡片 hover 陰影 */
+      --soft: #f6f8fc;                /* TAG 管理面板底色 */
 
-      --card-bg: rgba(150,190,200,.5);/* 卡片底色 */
-      --card-line: #005073;           /* 卡片邊框、工具列虛線 */
-      --soft: #e9f3f5;                /* TAG 管理面板底色 */
+      --menu-btn-bg: #19448e;         /* 漢堡按鈕底色 */
+      --menu-btn-hover: #1f6fd0;
+      --menu-btn-ink: #ffffff;
+      --nav-bg: rgba(255,255,255,.88);/* 抽屜選單底色 */
+      --nav-hover-bg: #f3f7fd;
+      --overlay: rgba(25,68,142,.15); /* 選單展開時的背景遮罩 */
 
-      --pill-bg: #fff;                /* TAG 按鈕底色 */
-      --pill-line: #bfd4d9;
-      --pill-on-bg: #005073;          /* 啟用中的 TAG 底色 */
-      --pill-on-ink: #fff;            /* 啟用中的 TAG 文字色 */
+      --pill-bg: #ffffff;             /* TAG 按鈕底色 */
+      --pill-line: #dfe5f0;
+      --pill-on-bg: #19448e;          /* 啟用中的 TAG 底色 */
+      --pill-on-ink: #ffffff;         /* 啟用中的 TAG 文字色 */
 
-      --btn-bg: #005073;              /* 一般按鈕底色 */
-      --btn-ink: #fff;                /* 一般按鈕文字色 */
-      --btn-hover-bg: #099BC8;
-      --btn-hover-ink: #fff;
-      --danger-bg: #c94c4c;           /* 刪除按鈕 */
-      --danger-hover: #a03939;
-      --map-bg: #0F7485;              /* Google Maps 地點按鈕 */
-      --map-hover: #5BA8B5;
+      --btn-bg: #19448e;              /* 一般按鈕底色 */
+      --btn-ink: #ffffff;             /* 一般按鈕文字色 */
+      --btn-hover-bg: #1f6fd0;
+      --btn-hover-ink: #ffffff;
+      --danger: #c0392b;              /* 刪除按鈕（外框＋文字） */
 
-      --field-bg: #fff;               /* 輸入框底色 */
-      --field-ink: #173e4a;           /* 輸入框文字色 */
-      --dialog-bg: #fff;              /* 編輯視窗底色 */
+      --map-bg: #19448e;              /* Google Maps 地點按鈕 */
+      --map-hover: #1f6fd0;
+      --map-ink: #ffffff;
+      --map-hover-ink: #ffffff;
 
-      --link: #2F16A1;                /* 超連結色 */
-      --link-hover: #866FEB;
+      --link: #1f6fd0;                /* 卡片內超連結色 */
+      --link-hover-ink: #ffffff;      /* 超連結 hover 時的文字色 */
 
-      --chip-bg: rgba(255,255,255,.6);/* 卡片上的 #tag 小標籤 */
-      --chip-line: #bad0d5;
-      --shadow: rgba(0,0,0,.08);
+      --field-bg: #ffffff;            /* 輸入框底色 */
+      --field-ink: #333333;           /* 輸入框文字色 */
+      --dialog-bg: #ffffff;           /* 編輯視窗底色 */
+      --backdrop: rgba(0,0,0,.4);
+
+      --chip-bg: #f4f7fc;             /* 卡片上的 #tag 小標籤 */
+      --chip-line: #dfe5f0;
     }
 
     :root[data-theme=dark] {
       color-scheme: dark;
-      --ink: #d6eef3;                 /* 暗色：主要文字色 */
-      --accent: #5cc8ea;
-      --page: #0f1c21;
+      --page: #2a2625;                /* 暗色：頁面底色（比 #433d3c 再深一階） */
+      --ink: #ece3dc;                 /* 暗色：一般文字色 */
+      --title: #d4b08f;               /* 暗色：標題色（#b28c6e 的亮階，對比較夠） */
+      --body: #cfc4bb;                /* 暗色：卡片內文色 */
+      --muted: #a39890;
+      --accent: #c9a07f;
+      --line: #4a4342;
 
-      --veil: 15,28,33;
-      --veil-top: .85;
-      --veil-bottom: .6;
-      --veil-menu: .7;
+      --card-bg: #433d3c;             /* 暗色：卡片底色 */
+      --card-line: #554d4b;
+      --shadow: rgba(0,0,0,.45);
+      --soft: #332e2d;
 
-      --card-bg: rgba(30,66,77,.6);
-      --card-line: #3d6b78;
-      --soft: #16323b;
+      --menu-btn-bg: #856859;
+      --menu-btn-hover: #b28c6e;
+      --menu-btn-ink: #ffffff;
+      --nav-bg: rgba(51,46,45,.92);
+      --nav-hover-bg: #3b3534;
+      --overlay: rgba(0,0,0,.5);
 
-      --pill-bg: #142a31;
-      --pill-line: #2f5560;
-      --pill-on-bg: #5cc8ea;
-      --pill-on-ink: #06222b;
+      --pill-bg: #433d3c;
+      --pill-line: #5d5452;
+      --pill-on-bg: #b28c6e;
+      --pill-on-ink: #2a2625;
 
-      --btn-bg: #2c7f99;
-      --btn-ink: #fff;
-      --btn-hover-bg: #5cc8ea;
-      --btn-hover-ink: #06222b;
-      --danger-bg: #b24545;
-      --danger-hover: #d05a5a;
-      --map-bg: #1b8196;
-      --map-hover: #4fb3c6;
+      --btn-bg: #856859;
+      --btn-ink: #ffffff;
+      --btn-hover-bg: #b28c6e;
+      --btn-hover-ink: #2a2625;
+      --danger: #e8a090;
 
-      --field-bg: #0f1c21;
-      --field-ink: #e3f1f4;           /* 暗色：輸入框文字色 */
-      --dialog-bg: #12262d;
+      --map-bg: #856859;
+      --map-hover: #b28c6e;
+      --map-ink: #ffffff;
+      --map-hover-ink: #2a2625;
 
-      --link: #8ec5ff;                /* 暗色：超連結色 */
-      --link-hover: #bcdcff;
+      --link: #f2be84;                /* 暗色：超連結色（比內文橘一點，才分得出來） */
+      --link-hover-ink: #2a2625;
 
-      --chip-bg: rgba(255,255,255,.08);
-      --chip-line: #2f5560;
-      --shadow: rgba(0,0,0,.4);
+      --field-bg: #2a2625;
+      --field-ink: #ece3dc;           /* 暗色：輸入框文字色 */
+      --dialog-bg: #352f2e;
+      --backdrop: rgba(0,0,0,.6);
+
+      --chip-bg: rgba(255,255,255,.06);
+      --chip-line: #5d5452;
     }
 
     /* ============================================================
        基本設定
        ============================================================ */
-    * { box-sizing: border-box; }          /* 加 padding 不會爆版 */
-    [hidden] { display: none !important; }
-
-    html { font-size: 14px; }
-
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      max-width: 100%;
-      font-family: "Noto Sans TC", "Slabo", serif;
-      color: var(--ink);
-      background-color: var(--page);
-      background-image:
-        linear-gradient(to top, rgba(var(--veil), var(--veil-top)) 70%, rgba(var(--veil), var(--veil-bottom)) 100%),
-        url(bg_map.jpg);
-      background-repeat: no-repeat;
-      background-position: center top;
-      background-size: 100% auto;
     }
 
+    [hidden] { display: none !important; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      color: var(--ink);
+      background-color: var(--page);
+      line-height: 1.6;
+      letter-spacing: .1em;
+    }
+
+    a { text-decoration: none; }
     button, input, textarea { font: inherit; }
     button { cursor: pointer; }
 
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
     /* ============================================================
-       頂部選單
+       縮起來的選單（漢堡按鈕＋右側抽屜）
        ============================================================ */
-    .menu {
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
       display: flex;
-      width: 100%;
-      padding: 30px 0;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--menu-btn-bg);
+      color: var(--menu-btn-ink);
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+      transition: background-color .3s, transform .2s;
     }
 
-    .menu_L {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      padding: 90px 0 0 0;
-      width: 30%;
-      height: 340px;
+    .menu-toggle:hover {
+      background: var(--menu-btn-hover);
+      transform: scale(1.05);
     }
 
-    /* 選單項目（區域、Backup、Load、+ Add、主題切換共用） */
-    .mi {
+    .nav-menu {
+      position: fixed;
+      top: 0;
+      right: -250px;                  /* 預設藏在右側畫面外 */
+      z-index: 999;
+      width: 250px;
+      height: 100%;
+      padding-top: 80px;
+      overflow-y: auto;
+      background: var(--nav-bg);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      box-shadow: -4px 0 15px rgba(0,0,0,.08);
+      visibility: hidden;             /* 收起時不讓鍵盤 Tab 到裡面 */
+      transition: right .3s ease, visibility 0s .3s;
+    }
+
+    .nav-menu.active {
+      right: 0;
+      visibility: visible;
+      transition: right .3s ease, visibility 0s;
+    }
+
+    .nav-menu ul { list-style: none; }
+
+    .nav-item {
       display: block;
       width: 100%;
-      padding: 0 20px 0 0;
-      line-height: 2rem;
-      font-weight: 700;
-      font-size: 1rem;
-      font-family: inherit;
-      text-align: right;
-      color: var(--ink);
+      padding: 15px 30px;
       border: 0;
+      border-bottom: 1px solid var(--line);
       background: none;
-      cursor: pointer;
-    }
-
-    .mi:hover,
-    .mi.active { color: var(--accent); }
-
-    .mi:hover {
-      background: linear-gradient(to left, rgba(var(--veil), .5) 50%, rgba(var(--veil), 0) 100%);
-    }
-
-    .menu_R {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 70%;
-      height: 340px;
-      background: linear-gradient(to right, rgba(var(--veil), var(--veil-menu)) 70%, rgba(var(--veil), 0) 100%);
-    }
-
-    .header {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      margin: 0;
-      padding: 80px 0 0 20px;
-      width: 100%;
-      font-size: 3rem;
-      font-weight: 700;
       color: var(--ink);
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: .1em;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color .2s, color .2s, padding-left .2s;
     }
 
-    .header span { letter-spacing: .5em; }
+    /* 目前選中的區域（app.js 會在 .region 上加 .active） */
+    .nav-item:hover,
+    .nav-item.active {
+      padding-left: 35px;
+      border-left: 3px solid var(--accent);
+      background: var(--nav-hover-bg);
+      color: var(--accent);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 998;
+      display: none;
+      background: var(--overlay);
+    }
+
+    .menu-overlay.active { display: block; }
 
     /* ============================================================
-       TAG 區（寬度與下方卡片區對齊）
+       頁首標題（固定在頁面最上方）
+       ============================================================ */
+    .header {
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
+    }
+
+    .header h1 {
+      margin-bottom: 15px;
+      color: var(--title);
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
+    }
+
+    .header p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* ============================================================
+       TAG 區
        ============================================================ */
     .tag-area {
-      width: 80%;
-      margin: 0 auto 6px;
-      padding: 0 30px 15px;
-      border-bottom: 1px solid var(--card-line);
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
     }
 
     .tag-top {
@@ -217,36 +285,44 @@
       flex-wrap: wrap;
     }
 
-    .tag-top h2 { margin: 0; font-size: 1.15rem; }
+    .tag-top h2 {
+      color: var(--title);
+      font-size: 14px;
+    }
 
     .tags {
       display: flex;
       flex-wrap: wrap;
       gap: 9px;
-      margin-top: 13px;
+      margin-top: 14px;
     }
 
     .tag-pill {
+      padding: 5px 14px;
       border: 1px solid var(--pill-line);
-      border-radius: 30px;
-      padding: 5px 13px;
+      border-radius: 20px;
       background: var(--pill-bg);
       color: var(--ink);
+      font-size: 13px;
+      transition: all .3s ease;
     }
 
-    .tag-pill:hover { border-color: var(--accent); }
+    .tag-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
     .tag-pill.active {
-      background: var(--pill-on-bg);
       border-color: var(--pill-on-bg);
+      background: var(--pill-on-bg);
       color: var(--pill-on-ink);
     }
 
     .tag-manager {
       margin-top: 15px;
       padding: 14px;
+      border-radius: 8px;
       background: var(--soft);
-      border-radius: 9px;
     }
 
     .manager-heading {
@@ -259,8 +335,8 @@
 
     .tag-manage-row {
       display: flex;
-      gap: 8px;
       align-items: center;
+      gap: 8px;
       flex-wrap: wrap;
       margin: 8px 0;
     }
@@ -286,76 +362,65 @@
        ============================================================ */
     .wrap {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      justify-content: center;
-      gap: 30px;
-      width: 80%;
-      margin: 0 auto;
-      padding: 0 30px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px 30px;
+      margin-bottom: 50px;
     }
 
     .travelCard {
       display: flex;
       flex-direction: column;
-      width: 100%;
-      margin: 16px auto;
-      padding: 24px;
+      min-width: 0;
+      padding: 15px;
       border: 1px solid var(--card-line);
       border-radius: 8px;
       background: var(--card-bg);
-      transition: .2s ease;            /* 浮動感 */
+      transition: box-shadow .3s ease;
     }
 
-    .travelCard:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px var(--shadow);
-    }
+    .travelCard:hover { box-shadow: 0 4px 15px var(--shadow); }
 
     .card-toolbar {
-      text-align: right;
-      margin-bottom: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 12px;
       padding-bottom: 10px;
-      border-bottom: 1px dashed var(--card-line);
+      border-bottom: 1px dashed var(--line);
     }
 
-    .card-content { min-width: 0; }
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
 
     /* 卡片標題（地點） */
     .Location_tit {
-      display: block;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      font-size: 1.6rem;
-      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--title);
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.5;
+      letter-spacing: .1em;
       text-align: center;
-      line-height: 2.4rem;
-      letter-spacing: .5em;
-      color: var(--ink);
       overflow-wrap: anywhere;
     }
 
     /* 欄位小標題（【日期】【Google Maps】…） */
     .stit {
-      display: block;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-      font-size: 1.2rem;
-      font-weight: 700;
-      line-height: 2em;
-      color: var(--ink);
+      margin-top: 14px;
+      color: var(--title);
+      font-size: 14px;
+      font-weight: bold;
+      line-height: 1.8;
     }
 
     /* 欄位內容 */
     .content {
-      display: block;
-      width: 100%;
-      margin: 0 0 20px 0;
-      padding: 0;
-      font-size: 1rem;
-      line-height: 1.8em;
-      letter-spacing: .03em;
+      margin: 2px 0 6px;
+      color: var(--body);
+      font-size: 14px;
+      line-height: 1.8;
       white-space: pre-wrap;           /* 保留你輸入時的換行 */
       overflow-wrap: anywhere;
     }
@@ -367,10 +432,15 @@
 
     .content a {
       color: var(--link);
-      text-decoration: underline;
+      transition: color .2s;
     }
 
-    .content a:hover { color: var(--link-hover); }
+    .content a:hover {
+      border-radius: 20px;
+      background: var(--link);
+      box-shadow: 0 0 0 3px var(--link);
+      color: var(--link-hover-ink);
+    }
 
     /* Google Maps 欄位：連結顯示成按鈕，多地點並排 */
     .content.maps {
@@ -383,36 +453,42 @@
 
     .content a.location-btn {
       display: inline-block;
-      padding: 5px 12px;
+      padding: 5px 14px;
+      border-radius: 20px;
       background: var(--map-bg);
-      color: #fff;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: .2s;
+      color: var(--map-ink);
+      font-size: 13px;
+      font-weight: bold;
+      transition: background-color .3s, color .3s;
     }
 
-    .content a.location-btn:hover { background: var(--map-hover); color: #fff; }
+    .content a.location-btn:hover {
+      background: var(--map-hover);
+      box-shadow: none;
+      color: var(--map-hover-ink);
+    }
 
     .card-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-top: 14px;
     }
 
     .card-tag {
-      font-size: 12px;
-      padding: 2px 9px;
-      background: var(--chip-bg);
+      padding: 2px 10px;
       border: 1px solid var(--chip-line);
       border-radius: 20px;
+      background: var(--chip-bg);
+      font-size: 12px;
     }
 
     .muted { opacity: .65; }
 
     .empty {
       grid-column: 1 / -1;
-      text-align: center;
       padding: 60px 10px;
+      text-align: center;
     }
 
     /* ============================================================
@@ -421,13 +497,14 @@
     .edit-btn,
     .delete-btn,
     .primary {
-      padding: 5px 12px;
+      padding: 5px 14px;
       border: 0;
-      border-radius: 4px;
+      border-radius: 20px;
       background: var(--btn-bg);
       color: var(--btn-ink);
-      font-family: inherit;
-      transition: .2s;
+      font-size: 13px;
+      font-weight: bold;
+      transition: background-color .3s, color .3s;
     }
 
     .edit-btn:hover,
@@ -436,20 +513,31 @@
       color: var(--btn-hover-ink);
     }
 
+    /* 刪除：外框樣式，和一般按鈕區隔 */
     .delete-btn {
-      margin-left: 10px;
-      background: var(--danger-bg);
-      color: #fff;
+      background: transparent;
+      box-shadow: inset 0 0 0 1.5px var(--danger);
+      color: var(--danger);
     }
 
-    .delete-btn:hover { background: var(--danger-hover); }
+    .delete-btn:hover {
+      background: var(--danger);
+      color: var(--page);
+    }
 
     .secondary {
-      padding: 5px 12px;
+      padding: 5px 14px;
       border: 1px solid var(--pill-line);
-      border-radius: 5px;
+      border-radius: 20px;
       background: var(--pill-bg);
       color: var(--ink);
+      font-size: 13px;
+      transition: all .3s ease;
+    }
+
+    .secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     /* ============================================================
@@ -458,18 +546,24 @@
     dialog {
       width: min(640px, 94vw);
       max-height: 90vh;
-      overflow: auto;
+      margin: auto;                   /* 上面的 * 把 margin 清成 0，這裡要還原置中 */
       padding: 25px;
-      border: 1px solid var(--pill-line);
+      overflow: auto;
+      border: 1px solid var(--line);
       border-radius: 12px;
       background: var(--dialog-bg);
       color: var(--ink);
-      box-shadow: 0 15px 60px rgba(0,0,0,.2);
+      letter-spacing: .05em;
+      box-shadow: 0 15px 60px rgba(0,0,0,.25);
     }
 
-    dialog::backdrop { background: rgba(0,43,58,.47); }
+    dialog::backdrop { background: var(--backdrop); }
 
-    dialog h2 { margin-top: 0; }
+    dialog h2 {
+      margin-bottom: 12px;
+      color: var(--title);
+      font-size: 18px;
+    }
 
     .field {
       display: flex;
@@ -478,7 +572,10 @@
       margin: 13px 0;
     }
 
-    .field label { font-weight: 700; }
+    .field label {
+      font-size: 13px;
+      font-weight: bold;
+    }
 
     .field input,
     .field textarea,
@@ -486,14 +583,15 @@
       min-width: 0;
       padding: 9px;
       border: 1px solid var(--pill-line);
-      border-radius: 5px;
+      border-radius: 6px;
       background: var(--field-bg);
       color: var(--field-ink);
+      font-size: 14px;
     }
 
     .field textarea {
       resize: vertical;
-      line-height: 1.6;
+      line-height: 1.7;
     }
 
     .check-tags {
@@ -503,11 +601,12 @@
     }
 
     .check-tags label {
-      padding: 4px 10px;
+      padding: 4px 12px;
       border: 1px solid var(--pill-line);
       border-radius: 20px;
       background: var(--pill-bg);
-      font-weight: 400;
+      font-size: 13px;
+      font-weight: normal;
       cursor: pointer;
     }
 
@@ -520,119 +619,92 @@
       margin-top: 18px;
     }
 
-    .note { font-size: 12px; opacity: .7; }
+    .note {
+      margin-top: 8px;
+      font-size: 12px;
+      opacity: .7;
+    }
 
     .footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 12px;
       text-align: center;
-      padding: 20px;
-      opacity: .7;
     }
 
     /* ============================================================
        響應式
        ============================================================ */
-    @media (max-width: 1100px) {            /* 平板：2 欄 */
-      .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 768px) {             /* 手機 */
-      .menu { flex-direction: column; }
-
-      .menu_L,
-      .menu_R {
-        width: 100%;
-        height: auto;
-        padding: 0;
-      }
-
-      .menu_L {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .mi {
-        width: auto;
-        padding: 0 14px;
-        text-align: center;
-      }
-
-      .mi:hover {
-        background: linear-gradient(to top, rgba(var(--veil), .5) 70%, rgba(var(--veil), 0) 100%);
-      }
-
-      .menu_R {
-        background: linear-gradient(to bottom, rgba(var(--veil), var(--veil-menu)) 70%, rgba(var(--veil), 0) 100%);
-      }
-
-      .header { padding-bottom: 30px; }
-
-      .tag-area { width: 100%; padding: 0 16px 12px; }
-
-      .wrap {
-        grid-template-columns: 1fr;
-        width: 100%;
-        padding: 0 16px;
-      }
+    @media (max-width: 680px) {
+      .header p { font-size: 1em; }
+      .wrap { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-  <!-- 頂部選單 -->
-  <div class="menu">
-    <nav class="menu_L" aria-label="主選單">
+  <!-- 漢堡按鈕（固定在右上角） -->
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="選單" aria-expanded="false" aria-controls="navMenu">☰</button>
+
+  <!-- 滑出式選單：id 與 .region 都不能改，app.js 靠它們綁定功能 -->
+  <nav class="nav-menu" id="navMenu" aria-label="主選單">
+    <ul>
       <!-- 區域快捷：點一下篩選同名 TAG，再點一次取消 -->
-      <button type="button" class="mi region" data-tag="North">North</button>
-      <button type="button" class="mi region" data-tag="South">South</button>
-      <button type="button" class="mi region" data-tag="Central">Central</button>
-      <button type="button" class="mi region" data-tag="Islands">Islands</button>
+      <li><button class="nav-item region" type="button" data-tag="North">North</button></li>
+      <li><button class="nav-item region" type="button" data-tag="South">South</button></li>
+      <li><button class="nav-item region" type="button" data-tag="Central">Central</button></li>
+      <li><button class="nav-item region" type="button" data-tag="Islands">Islands</button></li>
 
-      <button type="button" class="mi" id="exportBtn">Backup</button>
-      <label class="mi" for="importFile">Load</label>
-      <input id="importFile" type="file" accept=".txt,.json" hidden>
-      <button type="button" class="mi" id="addCardBtn">+ Add</button>
-      <button type="button" class="mi" id="themeBtn">🌙 Dark</button>
-    </nav>
+      <li><button class="nav-item" id="addCardBtn" type="button">+ Add</button></li>
+      <li><button class="nav-item" id="exportBtn" type="button">Backup</button></li>
+      <li>
+        <label class="nav-item" for="importFile">Load</label>
+        <input id="importFile" type="file" accept=".txt,.json" hidden>
+      </li>
+      <!-- data-keep：按了不收起選單，才看得到換色效果 -->
+      <li><button class="nav-item" id="themeBtn" type="button" data-keep>🌙 Dark</button></li>
+    </ul>
+  </nav>
 
-    <div class="menu_R">
-      <h1 class="header">
-        <span>Travel</span>
-        <span>Card</span>
-      </h1>
-    </div>
-  </div>
+  <!-- 選單背景遮罩（點一下收起選單） -->
+  <div class="menu-overlay" id="menuOverlay"></div>
 
-  <!-- TAG 篩選與管理 -->
-  <section class="tag-area">
-    <div class="tag-top">
-      <h2>TAG <span id="tagCount" class="muted"></span></h2>
-      <button id="manageBtn" class="secondary" type="button">⚙ 管理 TAG</button>
-    </div>
+  <div class="container" id="top">
+    <!-- 頁首標題 -->
+    <header class="header">
+      <h1>Travel Card</h1>
+      <p>一日／半日旅記</p>
+    </header>
 
-    <div id="tagFilters" class="tags"></div>
-
-    <div id="tagManager" class="tag-manager" hidden>
-      <div class="manager-heading">
-        <strong>管理 TAG</strong>
-        <button id="closeTagManager" class="secondary" type="button">✕ 關閉</button>
+    <!-- TAG 篩選與管理 -->
+    <section class="tag-area">
+      <div class="tag-top">
+        <h2>TAG <span id="tagCount" class="muted"></span></h2>
+        <button id="manageBtn" class="secondary" type="button">⚙ 管理 TAG</button>
       </div>
-      <div class="tag-manage-row">
-        <input id="newTag" placeholder="新增 TAG 名稱" maxlength="40">
-        <button id="createTag" class="primary" type="button">新增</button>
+
+      <div id="tagFilters" class="tags"></div>
+
+      <div id="tagManager" class="tag-manager" hidden>
+        <div class="manager-heading">
+          <strong>管理 TAG</strong>
+          <button id="closeTagManager" class="secondary" type="button">✕ 關閉</button>
+        </div>
+        <div class="tag-manage-row">
+          <input id="newTag" placeholder="新增 TAG 名稱" maxlength="40">
+          <button id="createTag" class="primary" type="button">新增</button>
+        </div>
+        <div id="tagManageList" class="tag-manage-list"></div>
+        <p class="note">重新命名會同步更新所有卡片；刪除 TAG 只會移除分類，不會刪除卡片。</p>
       </div>
-      <div id="tagManageList" class="tag-manage-list"></div>
-      <p class="note">重新命名會同步更新所有卡片；刪除 TAG 只會移除分類，不會刪除卡片。</p>
+    </section>
+
+    <!-- 卡片列表（由 app.js 產生） -->
+    <main class="wrap" id="cardContainer"></main>
+
+    <div class="footer">
+      ©EdBrawley 202611 · TRAVEL CARD · 本機儲存 · 請定期備份
     </div>
-  </section>
-
-  <!-- 卡片列表（由 app.js 產生） -->
-  <main class="wrap" id="cardContainer"></main>
-
-  <div class="footer">
-    MEMO:next time +footer copyright &amp; update tag &amp; invisible funcion<br>
-    TRAVEL CARD · 本機儲存 · 請定期備份
   </div>
 
   <!-- 新增／編輯視窗：欄位依照原本 +Add 的模板 -->
@@ -663,5 +735,31 @@
   </dialog>
 
   <script src="./app.js" defer></script>
+
+  <!-- 選單開關：只管抽屜的展開與收起，與資料功能無關 -->
+  <script>
+    (function () {
+      var toggle = document.getElementById('menuToggle');
+      var nav = document.getElementById('navMenu');
+      var overlay = document.getElementById('menuOverlay');
+
+      function setOpen(open) {
+        nav.classList.toggle('active', open);
+        overlay.classList.toggle('active', open);
+        toggle.textContent = open ? '✕' : '☰';
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      toggle.addEventListener('click', function () { setOpen(!nav.classList.contains('active')); });
+      overlay.addEventListener('click', function () { setOpen(false); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+      // 點選項目後自動收起（有 data-keep 的除外）
+      nav.addEventListener('click', function (e) {
+        var item = e.target.closest('.nav-item');
+        if (item && !item.hasAttribute('data-keep')) setOpen(false);
+      });
+    })();
+  </script>
 </body>
 </html>
