@@ -1,13 +1,13 @@
 {
   "id": "./",
-  "name": "Quote Card｜私人語錄收藏",
-  "short_name": "Quote Card",
+  "name": "Memorandum｜備忘錄",
+  "short_name": "Memorandum",
   "description": "本機語錄收藏與 TAG 分類",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fafcfc",
-  "theme_color": "#005073",
+  "background_color": "#ffffff",
+  "theme_color": "#69140e",
   "icons": [
     {
       "src": "./icon-192.png",

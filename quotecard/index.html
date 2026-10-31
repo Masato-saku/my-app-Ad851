@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Quote Card｜私人語錄收藏</title>
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#005073">
   <link rel="apple-touch-icon" href="./icon-192.png">
 
   <!-- 在畫面繪製前先套用主題，避免暗色模式重新整理時閃白 -->
@@ -19,142 +18,300 @@
 
   <style>
     /* ============================================================
-       亮色主題（預設）
+       顏色變數
+       亮色在 :root（白底＋深酒紅，沿用 ShopHopping 配色），
+       暗色在下面的 :root[data-theme=dark]（鐵灰＋黑）。
+       想改任何顏色，只要改這兩組變數就好，下面的規則都是引用它們。
        ============================================================ */
-
-    /* 全站顏色變數：--ink 是主要文字色，--accent 是強調色 */
     :root {
-      --ink: #005073;
-      --accent: #099bc8;
-      --soft: #e9f3f5;
-      --line: #bfd4d9;
+      --page: #ffffff;                /* 頁面底色 */
+      --ink: #333333;                 /* 一般文字色 */
+      --title: #69140e;               /* 標題、卡片標題色 */
+      --body: #555555;                /* 卡片內文色 */
+      --muted: #666666;               /* 次要文字（副標、頁尾） */
+      --accent: #d91a2a;              /* 強調色（hover、連結） */
+      --line: #f0f0f0;                /* 分隔線 */
+
+      --card-bg: #ffffff;             /* 卡片底色 */
+      --card-line: #ececec;           /* 卡片邊框 */
+      --shadow: rgba(105,20,14,.08);  /* 卡片 hover 陰影 */
+      --soft: #fafafa;                /* TAG 管理面板底色 */
+
+      --menu-btn-bg: #69140e;         /* 漢堡按鈕底色 */
+      --menu-btn-hover: #d91a2a;
+      --menu-btn-ink: #ffffff;
+      --nav-bg: rgba(255,255,255,.88);/* 抽屜選單底色 */
+      --nav-hover-bg: #fff8f8;
+      --overlay: rgba(105,20,14,.15); /* 選單展開時的背景遮罩 */
+
+      --pill-bg: #ffffff;             /* TAG 按鈕底色 */
+      --pill-line: #e2e2e2;
+      --pill-on-bg: #69140e;          /* 啟用中的 TAG 底色 */
+      --pill-on-ink: #ffffff;         /* 啟用中的 TAG 文字色 */
+
+      --btn-bg: #69140e;              /* 一般按鈕底色 */
+      --btn-ink: #ffffff;             /* 一般按鈕文字色 */
+      --btn-hover-bg: #d91a2a;
+      --btn-hover-ink: #ffffff;
+      --danger: #d91a2a;              /* 刪除按鈕（外框＋文字） */
+
+      --link: #d91a2a;                /* 卡片內超連結色 */
+      --link-hover-ink: #ffffff;      /* 超連結 hover 時的文字色 */
+
+      --field-bg: #ffffff;            /* 輸入框底色 */
+      --field-ink: #333333;           /* 輸入框文字色 */
+      --dialog-bg: #ffffff;           /* 編輯視窗底色 */
+      --backdrop: rgba(0,0,0,.4);
+
+      --chip-bg: #f7f7f7;             /* 卡片上的 #tag 小標籤 */
+      --chip-line: #e6e6e6;
     }
 
-    * { box-sizing: border-box; }
+    :root[data-theme=dark] {
+      color-scheme: dark;
+      --page: #0e0f11;                /* 暗色：頁面底色（黑） */
+      --ink: #d4d8dd;                 /* 暗色：一般文字色 */
+      --title: #e8ebee;               /* 暗色：標題色 */
+      --body: #b9bec4;                /* 暗色：卡片內文色 */
+      --muted: #8d949b;
+      --accent: #aab4be;              /* 暗色：強調色（鐵灰偏亮） */
+      --line: #2a2e33;
+
+      --card-bg: #1a1d20;             /* 暗色：卡片底色（鐵灰） */
+      --card-line: #2c3136;
+      --shadow: rgba(0,0,0,.55);
+      --soft: #16181b;
+
+      --menu-btn-bg: #2b3036;
+      --menu-btn-hover: #4a525a;
+      --menu-btn-ink: #e8ebee;
+      --nav-bg: rgba(18,20,22,.9);
+      --nav-hover-bg: #1f2326;
+      --overlay: rgba(0,0,0,.55);
+
+      --pill-bg: #1a1d20;
+      --pill-line: #34393f;
+      --pill-on-bg: #c3c9d0;
+      --pill-on-ink: #111315;
+
+      --btn-bg: #3a4047;
+      --btn-ink: #e8ebee;
+      --btn-hover-bg: #59616a;
+      --btn-hover-ink: #ffffff;
+      --danger: #e08a8a;
+
+      --link: #9ec3e6;                /* 暗色：超連結色 */
+      --link-hover-ink: #0e0f11;
+
+      --field-bg: #0e0f11;
+      --field-ink: #d4d8dd;           /* 暗色：輸入框文字色 */
+      --dialog-bg: #16181b;
+      --backdrop: rgba(0,0,0,.65);
+
+      --chip-bg: #ffffff0d;
+      --chip-line: #34393f;
+    }
+
+    /* ============================================================
+       基本設定
+       ============================================================ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    [hidden] { display: none !important; }
+
+    html { scroll-behavior: smooth; }
 
     body {
-      margin: 0;
-      background: #fafcfc;
+      padding: 40px 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
       color: var(--ink);
-      font: 14px/1.7 "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      background-color: var(--page);
+      line-height: 1.6;
+      letter-spacing: .1em;
     }
 
+    a { text-decoration: none; }
     button, input, textarea { font: inherit; }
     button { cursor: pointer; }
 
-    /* ---------- 頂部選單 ---------- */
-    .menu {
-      display: flex;
-      min-height: 250px;
-      background: linear-gradient(110deg, #e3f1f3, #fff 68%);
-      padding: 30px 0;
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
     }
 
-    .menu_L {
-      width: 30%;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      justify-content: center;
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
     }
 
-    .menu_L button,
-    .menu_L label {
-      display: block;
-      width: 100%;
-      padding: 3px 20px;
-      text-align: right;
-      color: var(--ink);
-      font-weight: 700;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    .menu_L button:hover,
-    .menu_L label:hover {
-      color: var(--accent);
-      background: linear-gradient(to left, #fff8, transparent);
-    }
-
-    .menu_R {
-      width: 70%;
+    /* ============================================================
+       縮起來的選單（漢堡按鈕＋右側抽屜）
+       ============================================================ */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
       display: flex;
       align-items: center;
-      padding: 30px;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      background: var(--menu-btn-bg);
+      color: var(--menu-btn-ink);
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+      transition: background-color .3s, transform .2s;
     }
 
+    .menu-toggle:hover {
+      background: var(--menu-btn-hover);
+      transform: scale(1.05);
+    }
+
+    .nav-menu {
+      position: fixed;
+      top: 0;
+      right: -250px;                  /* 預設藏在右側畫面外 */
+      z-index: 999;
+      width: 250px;
+      height: 100%;
+      padding-top: 80px;
+      background: var(--nav-bg);
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      box-shadow: -4px 0 15px rgba(0,0,0,.08);
+      visibility: hidden;             /* 收起時不讓鍵盤 Tab 到裡面 */
+      transition: right .3s ease, visibility 0s .3s;
+    }
+
+    .nav-menu.active {
+      right: 0;
+      visibility: visible;
+      transition: right .3s ease, visibility 0s;
+    }
+
+    .nav-menu ul { list-style: none; }
+
+    .nav-item {
+      display: block;
+      width: 100%;
+      padding: 15px 30px;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      background: none;
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: .1em;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color .2s, color .2s, padding-left .2s;
+    }
+
+    .nav-item:hover {
+      padding-left: 35px;
+      border-left: 3px solid var(--accent);
+      background: var(--nav-hover-bg);
+      color: var(--accent);
+    }
+
+    .menu-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 998;
+      display: none;
+      background: var(--overlay);
+    }
+
+    .menu-overlay.active { display: block; }
+
+    /* ============================================================
+       頁首標題（固定在頁面最上方）
+       ============================================================ */
     .header {
-      font-size: clamp(38px, 5vw, 68px);
-      line-height: 1.1;
-      letter-spacing: .2em;
-      margin: 0;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+      text-align: center;
     }
 
-    .subtitle {
-      letter-spacing: .12em;
-      opacity: .7;
-      margin-top: 14px;
+    .header h1 {
+      margin-bottom: 15px;
+      color: var(--title);
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 1.5px;
     }
 
-    /* ---------- TAG 區 ---------- */
+    .header p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    /* ============================================================
+       TAG 區
+       ============================================================ */
     .tag-area {
-      width: min(1200px, 92%);
-      margin: 24px auto 6px;
-      padding: 15px 18px;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
       border-bottom: 1px solid var(--line);
     }
 
     .tag-top {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
       align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
     }
 
-    .tag-top h2 { margin: 0; font-size: 16px; }
+    .tag-top h2 {
+      color: var(--title);
+      font-size: 14px;
+    }
 
     .tags {
       display: flex;
       flex-wrap: wrap;
       gap: 9px;
-      margin-top: 13px;
+      margin-top: 14px;
     }
 
     .tag-pill {
-      border: 1px solid var(--line);
-      border-radius: 30px;
-      padding: 5px 13px;
-      background: #fff;
+      padding: 5px 14px;
+      border: 1px solid var(--pill-line);
+      border-radius: 20px;
+      background: var(--pill-bg);
       color: var(--ink);
+      font-size: 13px;
+      transition: all .3s ease;
+    }
+
+    .tag-pill:hover {
+      border-color: var(--accent);
+      color: var(--accent);
     }
 
     .tag-pill.active {
-      background: var(--ink);
-      color: #fff;
-      border-color: var(--ink);
+      border-color: var(--pill-on-bg);
+      background: var(--pill-on-bg);
+      color: var(--pill-on-ink);
     }
 
-    .tag-pill:hover { border-color: var(--accent); }
-
-    /* ---------- TAG 管理面板 ---------- */
     .tag-manager {
       margin-top: 15px;
-      background: var(--soft);
       padding: 14px;
-      border-radius: 9px;
+      border-radius: 8px;
+      background: var(--soft);
     }
-
-    .tag-manage-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      margin: 8px 0;
-      flex-wrap: wrap;
-    }
-
-    .tag-manage-row span { min-width: 100px; }
 
     .manager-heading {
       display: flex;
@@ -164,16 +321,23 @@
       margin-bottom: 10px;
     }
 
+    .tag-manage-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    .tag-manage-row span { min-width: 100px; }
+
     .tag-manage-list {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
       gap: 6px 16px;
     }
 
-    .tag-manage-list .tag-manage-row {
-      margin: 0;
-      padding: 5px 0;
-    }
+    .tag-manage-list .tag-manage-row { margin: 0; padding: 5px 0; }
 
     .tag-manage-list .tag-manage-row span {
       flex: 1;
@@ -181,94 +345,73 @@
       overflow-wrap: anywhere;
     }
 
-    /* ---------- 卡片列表 ---------- */
+    /* ============================================================
+       卡片列表
+       ============================================================ */
     .wrap {
-      width: min(1200px, 92%);
-      margin: 20px auto 70px;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px 30px;
+      margin-bottom: 50px;
     }
 
     .quote-card {
       display: flex;
       flex-direction: column;
       min-width: 0;
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: rgba(199, 224, 229, .48);
-      transition: transform .2s, box-shadow .2s;
+      padding: 15px;
+      border: 1px solid var(--card-line);
+      border-radius: 8px;
+      background: var(--card-bg);
+      transition: box-shadow .3s ease;
     }
 
-    .quote-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px #00334412;
-    }
+    .quote-card:hover { box-shadow: 0 4px 15px var(--shadow); }
 
     .card-toolbar {
       display: flex;
       justify-content: flex-end;
       gap: 8px;
-      border-bottom: 1px dashed #91b9c1;
+      margin-bottom: 12px;
       padding-bottom: 10px;
-      margin-bottom: 15px;
+      border-bottom: 1px dashed var(--line);
     }
 
-    /* ---------- 按鈕 ---------- */
-    .small-btn,
-    .primary {
-      border: 0;
-      border-radius: 5px;
-      background: var(--ink);
-      color: #fff;
-      padding: 5px 12px;
-    }
-
-    .small-btn:hover,
-    .primary:hover { background: var(--accent); }
-
-    .danger { background: #c45151; }
-    .danger:hover { background: #a73b3b; }
-
-    .secondary {
-      border: 1px solid var(--line);
-      background: #fff;
-      border-radius: 5px;
-      color: var(--ink);
-      padding: 5px 12px;
-    }
-
-    /* ---------- 卡片內容 ---------- */
     .card-title {
+      margin-bottom: 4px;
+      color: var(--title);
+      font-size: 16px;
+      font-weight: bold;
       text-align: center;
-      font-size: 21px;
-      font-weight: 700;
-      letter-spacing: .06em;
       overflow-wrap: anywhere;
     }
-
-    .card-body a {
-      color: #2F16A1;                 /* 亮色模式的連結顏色 */
-      text-decoration: underline;
-      overflow-wrap: anywhere;
-    }
-
-    .card-body a:hover { color: #866FEB; }
-
-    .card-body p { margin: .4em 0; }
 
     .card-body {
-      font-size: 15px;
+      flex: 1;
+      margin: 12px 0 16px;
+      color: var(--body);
+      font-size: 14px;
+      line-height: 1.8;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-      margin: 16px 0 20px;
-      line-height: 1.9;
-      flex: 1;
     }
 
     /* 含區塊標籤（p、div、li…）的卡片改用一般換行 */
     .card-body.html-mode { white-space: normal; }
+
+    .card-body p { margin: .4em 0; }
+
+    .card-body a {
+      color: var(--link);
+      transition: color .2s;
+    }
+
+    .card-body a:hover {
+      border-radius: 20px;
+      background: var(--link);
+      box-shadow: 0 0 0 3px var(--link);
+      color: var(--link-hover-ink);
+    }
 
     .card-tags {
       display: flex;
@@ -277,17 +420,17 @@
     }
 
     .card-tag {
-      font-size: 12px;
-      padding: 2px 9px;
-      background: #fff9;
-      border: 1px solid #bad0d5;
+      padding: 2px 10px;
+      border: 1px solid var(--chip-line);
       border-radius: 20px;
+      background: var(--chip-bg);
+      font-size: 12px;
     }
 
     .card-source {
-      font-size: 12px;
-      opacity: .75;
       margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
       overflow-wrap: anywhere;
     }
 
@@ -295,11 +438,83 @@
 
     .empty {
       grid-column: 1 / -1;
-      text-align: center;
       padding: 60px 10px;
+      text-align: center;
     }
 
-    /* ---------- 編輯對話框 ---------- */
+    /* ============================================================
+       按鈕
+       ============================================================ */
+    .small-btn,
+    .primary {
+      padding: 5px 14px;
+      border: 0;
+      border-radius: 20px;
+      background: var(--btn-bg);
+      color: var(--btn-ink);
+      font-size: 13px;
+      font-weight: bold;
+      transition: background-color .3s, color .3s;
+    }
+
+    .small-btn:hover,
+    .primary:hover {
+      background: var(--btn-hover-bg);
+      color: var(--btn-hover-ink);
+    }
+
+    /* 刪除：外框樣式，和一般按鈕區隔 */
+    .small-btn.danger {
+      background: transparent;
+      box-shadow: inset 0 0 0 1.5px var(--danger);
+      color: var(--danger);
+    }
+
+    .small-btn.danger:hover {
+      background: var(--danger);
+      color: var(--page);
+    }
+
+    .secondary {
+      padding: 5px 14px;
+      border: 1px solid var(--pill-line);
+      border-radius: 20px;
+      background: var(--pill-bg);
+      color: var(--ink);
+      font-size: 13px;
+      transition: all .3s ease;
+    }
+
+    .secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ============================================================
+       新增／編輯對話框
+       ============================================================ */
+    dialog {
+      width: min(600px, 94vw);
+      max-height: 90vh;
+      margin: auto;                   /* 上面的 * 把 margin 清成 0，這裡要還原置中 */
+      padding: 25px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--dialog-bg);
+      color: var(--ink);
+      letter-spacing: .05em;
+      box-shadow: 0 15px 60px rgba(0,0,0,.25);
+    }
+
+    dialog::backdrop { background: var(--backdrop); }
+
+    dialog h2 {
+      margin-bottom: 12px;
+      color: var(--title);
+      font-size: 18px;
+    }
+
     .field {
       display: flex;
       flex-direction: column;
@@ -307,50 +522,46 @@
       margin: 13px 0;
     }
 
+    .field label {
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     .field input,
     .field textarea,
     .tag-manager input {
-      border: 1px solid var(--line);
-      border-radius: 5px;
-      padding: 9px;
-      background: #fff;
-      color: #173e4a;                 /* 亮色模式的輸入框文字色 */
       min-width: 0;
+      padding: 9px;
+      border: 1px solid var(--pill-line);
+      border-radius: 6px;
+      background: var(--field-bg);
+      color: var(--field-ink);
+      font-size: 14px;
     }
 
     .field textarea {
       min-height: 180px;
       resize: vertical;
+      line-height: 1.7;
     }
 
     .check-tags {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
+      gap: 8px;
     }
 
     .check-tags label {
-      border: 1px solid var(--line);
+      padding: 4px 12px;
+      border: 1px solid var(--pill-line);
       border-radius: 20px;
-      padding: 4px 10px;
-      background: #fff;
+      background: var(--pill-bg);
+      font-size: 13px;
+      font-weight: normal;
       cursor: pointer;
     }
 
-    .check-tags input { accent-color: var(--ink); }
-
-    dialog {
-      width: min(600px, 94vw);
-      max-height: 90vh;
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 25px;
-      color: var(--ink);
-      box-shadow: 0 15px 60px #0003;
-    }
-
-    dialog::backdrop { background: #002b3a77; }
+    .check-tags input { accent-color: var(--accent); }
 
     .dialog-actions {
       display: flex;
@@ -359,171 +570,85 @@
       margin-top: 18px;
     }
 
-    .note { font-size: 12px; opacity: .7; }
+    .note {
+      margin-top: 8px;
+      font-size: 12px;
+      opacity: .7;
+    }
 
     .footer {
+      margin-top: 40px;
+      color: var(--muted);
+      font-size: 12px;
       text-align: center;
-      padding: 20px;
-      opacity: .6;
-    }
-
-    /* ---------- 響應式 ---------- */
-    @media (max-width: 1000px) {
-      .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 650px) {
-      .menu {
-        min-height: 0;
-        flex-direction: column-reverse;
-        padding: 15px 0;
-      }
-
-      .menu_L,
-      .menu_R { width: 100%; }
-
-      .menu_L {
-        flex-direction: row;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-
-      .menu_L button,
-      .menu_L label {
-        width: auto;
-        padding: 8px 12px;
-        text-align: center;
-      }
-
-      .menu_R {
-        justify-content: center;
-        text-align: center;
-        padding: 25px;
-      }
-
-      .header { font-size: 42px; }
-      .wrap { grid-template-columns: 1fr; }
     }
 
     /* ============================================================
-       暗色主題（只有在 <html data-theme="dark"> 時才生效）
+       響應式
        ============================================================ */
-
-    /* 暗色顏色變數：想整體改字色，優先改這裡的 --ink */
-    :root[data-theme=dark] {
-      color-scheme: dark;
-      --ink: #80aba9;                 /* 主要文字色（標題、一般文字、按鈕文字） */
-      --accent: #5cc8ea;              /* 強調色（hover、啟用中的 TAG） */
-      --soft: #16323b;                /* TAG 管理面板背景 */
-      --line: #2f5560;                /* 邊框線 */
+    @media (max-width: 680px) {
+      .header p { font-size: 1em; }
+      .wrap { grid-template-columns: 1fr; }
     }
-
-    :root[data-theme=dark] body { background: #0f1c21; }
-
-    :root[data-theme=dark] .menu {
-      background: linear-gradient(110deg, #12303a, #0f1c21 68%);
-    }
-
-    :root[data-theme=dark] .menu_L button:hover,
-    :root[data-theme=dark] .menu_L label:hover {
-      background: linear-gradient(to left, #ffffff14, transparent);
-    }
-
-    :root[data-theme=dark] .tag-pill,
-    :root[data-theme=dark] .secondary,
-    :root[data-theme=dark] .check-tags label {
-      background: #142a31;
-    }
-
-    :root[data-theme=dark] .tag-pill.active {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: #06222b;                 /* 啟用中 TAG 的文字色 */
-    }
-
-    :root[data-theme=dark] .quote-card { background: rgba(30, 66, 77, .55); }
-
-    :root[data-theme=dark] .card-toolbar { border-bottom-color: #3d6b78; }
-
-    :root[data-theme=dark] .small-btn,
-    :root[data-theme=dark] .primary {
-      background: #2c7f99;
-      color: #fff;                    /* 一般按鈕文字色 */
-    }
-
-    :root[data-theme=dark] .small-btn:hover,
-    :root[data-theme=dark] .primary:hover {
-      background: var(--accent);
-      color: #06222b;                 /* 按鈕 hover 時的文字色 */
-    }
-
-    :root[data-theme=dark] .danger { background: #b24545; color: #fff; }
-    :root[data-theme=dark] .danger:hover { background: #d05a5a; color: #fff; }
-
-    :root[data-theme=dark] .card-tag {
-      background: #ffffff14;
-      border-color: #2f5560;
-    }
-
-    :root[data-theme=dark] .card-body a { color: #8ec5ff; }        /* 暗色連結色 */
-    :root[data-theme=dark] .card-body a:hover { color: #bcdcff; }
-
-    :root[data-theme=dark] .field input,
-    :root[data-theme=dark] .field textarea,
-    :root[data-theme=dark] .tag-manager input {
-      background: #0f1c21;
-      color: #80aba9;                 /* 暗色輸入框文字色 */
-    }
-
-    :root[data-theme=dark] dialog { background: #12262d; }
   </style>
 </head>
 
 <body>
-  <!-- 頂部選單 -->
-  <header class="menu">
-    <nav class="menu_L" aria-label="主選單">
-      <button id="exportBtn">Backup</button>
-      <label for="importFile">Load</label>
-      <input id="importFile" type="file" accept=".txt,.json" hidden>
-      <button id="addCardBtn">+ Add</button>
-      <button id="themeBtn" type="button">🌙 Dark</button>
-    </nav>
-    <div class="menu_R">
-      <div>
-        <h1 class="header">Quote<br>Card</h1>
-        <div class="subtitle">私人語錄收藏</div>
+  <!-- 漢堡按鈕（固定在右上角） -->
+  <button class="menu-toggle" id="menuToggle" type="button" aria-label="選單" aria-expanded="false" aria-controls="navMenu">☰</button>
+
+  <!-- 滑出式選單：按鈕的 id 都不能改，app.js 靠 id 綁定功能 -->
+  <nav class="nav-menu" id="navMenu" aria-label="主選單">
+    <ul>
+      <li><button class="nav-item" id="addCardBtn" type="button">+ Add</button></li>
+      <li><button class="nav-item" id="exportBtn" type="button">Backup</button></li>
+      <li>
+        <label class="nav-item" for="importFile">Load</label>
+        <input id="importFile" type="file" accept=".txt,.json" hidden>
+      </li>
+      <!-- data-keep：按了不收起選單，才看得到換色效果 -->
+      <li><button class="nav-item" id="themeBtn" type="button" data-keep>🌙 Dark</button></li>
+    </ul>
+  </nav>
+
+  <!-- 選單背景遮罩（點一下收起選單） -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+
+  <div class="container" id="top">
+    <!-- 頁首標題 -->
+    <header class="header">
+      <h1>Quote Card</h1>
+      <p>私人語錄收藏</p>
+    </header>
+
+    <!-- TAG 篩選與管理 -->
+    <section class="tag-area">
+      <div class="tag-top">
+        <h2>TAG <span id="tagCount" class="muted"></span></h2>
+        <button id="manageBtn" class="secondary" type="button">⚙ 管理 TAG</button>
       </div>
-    </div>
-  </header>
 
-  <!-- TAG 篩選與管理 -->
-  <section class="tag-area">
-    <div class="tag-top">
-      <h2>TAG <span id="tagCount" class="muted"></span></h2>
-      <button id="manageBtn" class="secondary">⚙ 管理 TAG</button>
-    </div>
+      <div id="tagFilters" class="tags"></div>
 
-    <div id="tagFilters" class="tags"></div>
-
-    <div id="tagManager" class="tag-manager" hidden>
-      <div class="manager-heading">
-        <strong>管理 TAG</strong>
-        <button id="closeTagManager" class="secondary" type="button">✕ 關閉</button>
+      <div id="tagManager" class="tag-manager" hidden>
+        <div class="manager-heading">
+          <strong>管理 TAG</strong>
+          <button id="closeTagManager" class="secondary" type="button">✕ 關閉</button>
+        </div>
+        <div class="tag-manage-row">
+          <input id="newTag" placeholder="新增 TAG 名稱" maxlength="40">
+          <button id="createTag" class="primary" type="button">新增</button>
+        </div>
+        <div id="tagManageList" class="tag-manage-list"></div>
+        <p class="note">重新命名會同步更新所有卡片；刪除 TAG 只會移除分類，不會刪除卡片。</p>
       </div>
-      <div class="tag-manage-row">
-        <input id="newTag" placeholder="新增 TAG 名稱" maxlength="40">
-        <button id="createTag" class="primary">新增</button>
-      </div>
-      <div id="tagManageList" class="tag-manage-list"></div>
-      <p class="note">重新命名會同步更新所有卡片；刪除 TAG 只會移除分類，不會刪除卡片。</p>
-    </div>
-  </section>
+    </section>
 
-  <!-- 卡片列表（由 app.js 產生） -->
-  <main id="cardContainer" class="wrap"></main>
+    <!-- 卡片列表（由 app.js 產生） -->
+    <main id="cardContainer" class="wrap"></main>
 
-  <footer class="footer">QUOTE CARD · 本機儲存 · 請定期備份</footer>
+    <footer class="footer">©EdBrawley 202611 · QUOTE CARD · 本機儲存 · 請定期備份</footer>
+  </div>
 
   <!-- 新增／編輯對話框 -->
   <dialog id="cardDialog">
@@ -560,5 +685,31 @@
   </dialog>
 
   <script src="./app.js" defer></script>
+
+  <!-- 選單開關：只管抽屜的展開與收起，與資料功能無關 -->
+  <script>
+    (function () {
+      var toggle = document.getElementById('menuToggle');
+      var nav = document.getElementById('navMenu');
+      var overlay = document.getElementById('menuOverlay');
+
+      function setOpen(open) {
+        nav.classList.toggle('active', open);
+        overlay.classList.toggle('active', open);
+        toggle.textContent = open ? '✕' : '☰';
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+
+      toggle.addEventListener('click', function () { setOpen(!nav.classList.contains('active')); });
+      overlay.addEventListener('click', function () { setOpen(false); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+      // 點選項目後自動收起（有 data-keep 的除外）
+      nav.addEventListener('click', function (e) {
+        var item = e.target.closest('.nav-item');
+        if (item && !item.hasAttribute('data-keep')) setOpen(false);
+      });
+    })();
+  </script>
 </body>
 </html>
